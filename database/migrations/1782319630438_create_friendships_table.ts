@@ -1,4 +1,5 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
+import { FriendshipStatus } from '../../app/enums/friendship_status.ts'
 
 export default class extends BaseSchema {
   protected tableName = 'friendships'
@@ -9,7 +10,11 @@ export default class extends BaseSchema {
 
       table.uuid('user_id').notNullable().references('id').inTable('Users').onDelete('CASCADE')
       table.uuid('friend_id').notNullable().references('id').inTable('Users').onDelete('CASCADE')
-      table.enum('status', ['pending', 'accepted']).defaultTo('pending')
+
+      table
+        .enum('status', Object.values(FriendshipStatus))
+        .notNullable()
+        .defaultTo(FriendshipStatus.PENDING)
 
       table.timestamp('created_at')
       table.timestamp('updated_at')

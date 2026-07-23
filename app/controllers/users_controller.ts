@@ -4,11 +4,9 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
-export default class UserController {
+export default class UsersController {
   constructor(private userService: UserService) {}
-  /**
-   * Show individual record
-   */
+
   async showMe({ request }: HttpContext) {
     const userId = request.ctx?.userId || ''
     if (!userId || userId === '') throw new Error('User ID not found in context')
@@ -23,9 +21,6 @@ export default class UserController {
     return this.userService.findById(params.id)
   }
 
-  /**
-   * Handle form submission for the edit action
-   */
   async update({ request }: HttpContext) {
     const userId = request.ctx?.userId || ''
     if (!userId || userId === '') throw new Error('User ID not found in context')
@@ -34,9 +29,6 @@ export default class UserController {
     return this.userService.update(userId, payload)
   }
 
-  /**
-   * Delete record
-   */
   async destroy({ request }: HttpContext) {
     const userId = request.ctx?.userId || ''
     if (!userId || userId === '') throw new Error('User ID not found in context')
