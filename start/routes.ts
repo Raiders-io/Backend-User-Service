@@ -7,15 +7,23 @@
 |
 */
 
+import verifyToken from '#services/verify_token_service'
+import router from '@adonisjs/core/services/router'
+import { middleware } from '#start/kernel'
+
 const UsersController = () => import('#controllers/users_controller')
 const FriendsController = () => import('#controllers/friends_controller')
-import router from '@adonisjs/core/services/router'
 
 router
   .group(() => {
-    router.get('/me', [UsersController, 'showMe'])
-    router.patch('/me', [UsersController, 'update'])
-    router.delete('/me', [UsersController, 'destroy'])
+    router
+      .group(() => {
+        router.get('/me', [UsersController, 'showMe'])
+        router.patch('/me', [UsersController, 'update'])
+        router.delete('/me', [UsersController, 'destroy'])
+      })
+      .use(middleware.auth())
+
     router.get('/:id', [UsersController, 'show'])
   })
   .prefix('/profile')
@@ -32,3 +40,4 @@ router
     router.delete('/:friendId', [FriendsController, 'destroy'])
   })
   .prefix('/friends/me')
+  .use(middleware.auth())
