@@ -43,7 +43,7 @@ export class FriendshipService {
     return friendship
   }
 
-  async rejectRequest(currentUserId: string, requesterId: string) {
+  async declineRequest(currentUserId: string, requesterId: string) {
     const friendship = await Friendship.query()
       .where('user_id', requesterId)
       .where('friend_id', currentUserId)
@@ -90,6 +90,13 @@ export class FriendshipService {
       .where('friend_id', userId)
       .where('status', FriendshipStatus.PENDING)
       .preload('user')
+  }
+
+  async getSentRequests(userId: string) {
+    return Friendship.query()
+      .where('user_id', userId)
+      .where('status', FriendshipStatus.PENDING)
+      .preload('friend')
   }
 
   private async findRelation(userId: string, friendId: string) {

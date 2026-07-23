@@ -22,8 +22,13 @@ router
 
 router
   .group(() => {
-    router.get('/', [FriendsController, 'indexMe'])
-    router.post('/', [FriendsController, 'storeMe'])
-    router.delete('/:friendId', [FriendsController, 'destroyMe'])
+    router.get('/', [FriendsController, 'index'])
+    router.get('/requests', [FriendsController, 'pendingRequests'])
+    router.get('/requests/sent', [FriendsController, 'sentRequests'])
+    router.post('/requests/:friendId', [FriendsController, 'sendRequest'])
+    router.delete('/requests/:friendId', [FriendsController, 'cancelRequest'])
+    router.patch('/requests/:askingId/accept', [FriendsController, 'acceptRequest'])
+    router.patch('/requests/:askingId/decline', [FriendsController, 'declineRequest'])
+    router.delete('/:friendId', [FriendsController, 'destroy'])
   })
-  .prefix('/profile/me/friends')
+  .prefix('/friends/me')
