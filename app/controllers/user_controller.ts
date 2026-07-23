@@ -1,65 +1,46 @@
-import User from '#models/user'
-import { createUserValidator, updateUserValidator } from '#validators/user'
+import UserService from '#services/user_service'
+import { updateUserValidator } from '#validators/user'
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { read } from 'node:fs'
 
+@inject()
 export default class UserController {
-  /**
-   * Handle form submission for the create action
-   */
-  async store({ request, response }: HttpContext) {
-    const userId = request.ctx?.userId || ''
-    if (!userId || userId === '') throw new Error('User ID not found in context')
-
-    const payload = await request.validateUsing(createUserValidator)
-
-    const user = await User.create({
-      ...payload,
-      id: userId,
-    })
-
-    return response.created(user)
-  }
-
+  constructor(private userService: UserService) {}
   /**
    * Show individual record
    */
-  async show({ params, request, response }: HttpContext) {
+  async showMe({ request }: HttpContext) {
     const userId = request.ctx?.userId || ''
     if (!userId || userId === '') throw new Error('User ID not found in context')
 
-    const user = await User.find(params.id)
-    if (!user) {
-      return response.notFound({ message: 'User profile not found' })
-    }
+    return this.userService.findById(userId)
+  }
 
-    return user
+  async show({ request, params }: HttpContext) {
+    const userId = request.ctx?.userId || ''
+    if (!userId || userId === '') throw new Error('User ID not found in context')
+
+    return this.userService.findById(params.id)
   }
 
   /**
    * Handle form submission for the edit action
    */
-  async update({ params, request, response }: HttpContext) {
+  async update({ request }: HttpContext) {
     const userId = request.ctx?.userId || ''
     if (!userId || userId === '') throw new Error('User ID not found in context')
 
-    if (userId !== params.id) {
-      return response.forbidden({ message: 'Not your profile' })
-    }
-    const user = await User.find(params.id)
-    if (!user) {
-      return response.notFound({ message: 'User profile not found' })
-    }
-
     const payload = await request.validateUsing(updateUserValidator)
-
-    user.merge(payload)
-    await user.save()
-    return user
+    return this.userService.update(userId, payload)
   }
 
   /**
    * Delete record
    */
-  async destroy({ params }: HttpContext) {}
+  async destroy({ request }: HttpContext) {
+    const userId = request.ctx?.userId || ''
+    if (!userId || userId === '') throw new Error('User ID not found in context')
+
+    return this.userService.delete(userId)
+  }
 }

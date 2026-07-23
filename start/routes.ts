@@ -7,11 +7,14 @@
 |
 */
 
+const UserController = () => import('#controllers/user_controller')
 import router from '@adonisjs/core/services/router'
-import { controllers } from '#generated/controllers'
 
 router
   .group(() => {
-    router.resource('User', controllers.User).apiOnly().except(['index'])
+    router.get('/me', [UserController, 'showMe'])
+    router.patch('/me', [UserController, 'update'])
+    router.delete('/me', [UserController, 'destroy'])
+    router.get('/:id', [UserController, 'show'])
   })
-  .prefix('/api/v1')
+  .prefix('/profile')
