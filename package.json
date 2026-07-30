@@ -10,6 +10,9 @@
   },
   "scripts": {
     "start": "node bin/server.js",
+    "prod": "node bin/server.js",
+    "migration": "node ace migration:run",
+    "migration-force": "node ace migration:run --force",
     "build": "node ace build",
     "dev": "node ace serve --hmr",
     "test": "node ace test",
@@ -66,8 +69,8 @@
     "@tuyau/core": "^1.2.2",
     "@vinejs/vine": "^4.4.0",
     "adonis": "^0.9.0",
-    "better-sqlite3": "^12.10.0",
     "luxon": "^3.7.2",
+    "pg": "^8.21.0",
     "reflect-metadata": "^0.2.2"
   },
   "hotHook": {
@@ -78,7 +81,6 @@
   },
   "prettier": "@adonisjs/prettier-config",
   "allowScripts": {
-    "@swc/core@1.15.43": true,
-    "better-sqlite3@12.11.1": true
+    "@swc/core@1.15.43": true
   }
 }
