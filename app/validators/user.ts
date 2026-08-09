@@ -1,5 +1,5 @@
 import vine from '@vinejs/vine'
-import { username, name, bio } from '#validators/shared_fields'
+import { username, name, bio, avatar } from '#validators/shared_fields'
 import { isUsernameAvailable } from '#services/user_service'
 
 export const createUserValidator = vine.create({
@@ -7,6 +7,7 @@ export const createUserValidator = vine.create({
   firstname: name(),
   lastname: name(),
   bio: bio().optional(),
+  avatar: avatar().optional()
 })
 
 export const updateUserValidator = vine.create({
@@ -14,4 +15,5 @@ export const updateUserValidator = vine.create({
   firstname: name().optional(),
   lastname: name().optional(),
   bio: bio().optional(),
+  avatar: avatar().optional()
 })

@@ -34,4 +34,11 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   // Upstream services
   AUTH_SERVICE_URL: Env.schema.string({ format: 'url', tld: false }),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring the drive package
+  |----------------------------------------------------------
+  */
+  DRIVE_DISK: Env.schema.enum(['fs'] as const)
 })

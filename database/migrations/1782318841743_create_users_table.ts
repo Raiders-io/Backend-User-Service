@@ -12,6 +12,7 @@ export default class extends BaseSchema {
       table.string('bio')
       table.timestamp('created_at')
       table.timestamp('updated_at')
+       table.string('avatar_url').nullable()
     })
   }
 

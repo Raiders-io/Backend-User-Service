@@ -2,6 +2,8 @@ import type { FieldContext } from '@vinejs/vine/types'
 import type { Database } from '@adonisjs/lucid/database'
 import User from '#models/user'
 import UserNotFoundException from '#exceptions/user_not_found_exception'
+import { MultipartFile } from '@adonisjs/core/types/bodyparser'
+import drive from '@adonisjs/drive/services/main'
 
 export async function isUsernameAvailable(db: Database, value: string, field: FieldContext) {
   const query = db.from('profiles').where('username', value)
@@ -29,8 +31,16 @@ export default class UserService {
     return user
   }
 
-  async update(id: string, payload: Partial<User>) {
+  async update(id: string, payload: Partial<User> & { avatar?: MultipartFile }) {
     const user = await this.findById(id)
+    const {avatar, ...rest } = payload
+  
+    if (avatar) {
+      const key = `avatars/${user.id}-${Date.now()}.${avatar.extname}`
+      await avatar.moveToDisk(key)
+      user.avatar_url = await drive.use().getUrl(key)
+    }
+
     user.merge(payload)
     await user.save()
     return user
