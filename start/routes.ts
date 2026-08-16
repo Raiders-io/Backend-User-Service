@@ -9,6 +9,7 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import { searchThrottle } from './limiter.ts'
 
 const UsersController = () => import('#controllers/users_controller')
 const FriendsController = () => import('#controllers/friends_controller')
@@ -25,7 +26,7 @@ router
         router.get('/me/lessons/ongoing', [LessonsController, 'ongoing'])
       })
       .use(middleware.auth())
-
+    router.get('/search', [UsersController, 'search']).use(searchThrottle)
     router.get('/:id', [UsersController, 'show'])
   })
   .prefix('/profile')

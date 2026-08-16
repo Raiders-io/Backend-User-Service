@@ -139,4 +139,15 @@ export default class UserService {
       currentStreak: user.currentStreak,
     }
   }
+
+  async searchByUsername(query: string, page: number, limit: number) {
+    const result = await User.query()
+      .whereILike('username', `${query}%`)
+      .orderBy('username', 'asc')
+      .paginate(page, limit)
+
+    return result.serialize({
+      fields: ['id', 'username', 'firstname', 'lastname', 'avatar_url'],
+    })
+  }
 }
