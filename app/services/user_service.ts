@@ -13,7 +13,7 @@ import {
   AvatarUploadFailedException,
 } from '#exceptions/avatar_exception'
 
-import { AVATAR_CONSTRAINTS } from '../constants/avatar_constants.ts'
+import { AVATAR_CONSTRAINTS } from '#constants/avatar_constants'
 import LessonCompleted from '#models/lesson_completion'
 
 export async function isUsernameAvailable(db: Database, value: string, field: FieldContext) {

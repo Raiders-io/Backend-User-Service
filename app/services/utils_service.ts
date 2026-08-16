@@ -1,6 +1,6 @@
 import UserIdNotFoundException from '#exceptions/user_id_not_found_exception'
 import type { HttpContext } from '@adonisjs/core/http'
-import { DEFAULT_PAGINATION } from '../constants/global_constants.ts'
+import { DEFAULT_PAGINATION } from '#constants/global_constants'
 
 export function getUserId(ctx: HttpContext): string {
   const userId = ctx.userId

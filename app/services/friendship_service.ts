@@ -1,5 +1,5 @@
 import Friendship from '#models/friendship'
-import { FriendshipStatus } from '../constants/friendship_status.ts'
+import { FriendshipStatus } from '#constants/friendship_status'
 import {
   CannotFriendSelfException,
   FriendRequestAlreadyPendingException,

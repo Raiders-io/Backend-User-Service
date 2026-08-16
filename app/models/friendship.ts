@@ -1,8 +1,8 @@
 import { FriendshipSchema } from '#database/schema'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
-import User from './user.js'
 import { belongsTo, column } from '@adonisjs/lucid/orm'
-import { FriendshipStatus } from '../constants/friendship_status.ts'
+import { FriendshipStatus } from '#constants/friendship_status'
+import User from '#models/user'
 
 export default class Friendship extends FriendshipSchema {
   @belongsTo(() => User)
