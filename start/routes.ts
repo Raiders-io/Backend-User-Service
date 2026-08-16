@@ -20,6 +20,7 @@ router
         router.get('/me', [UsersController, 'showMe'])
         router.patch('/me', [UsersController, 'update'])
         router.delete('/me', [UsersController, 'destroy'])
+        //router.get('/me/lessons', [LessonsController, 'mine'])
       })
       .use(middleware.auth())
 

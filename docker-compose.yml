@@ -39,8 +39,8 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
-    # ports:
-    #   - "5432:5432" #TODO : Expose port only in dev mode, not in production
+    ports:
+      - "5432:5432" #TODO : Expose port only in dev mode, not in production
     networks:
       - user-backend
     volumes:

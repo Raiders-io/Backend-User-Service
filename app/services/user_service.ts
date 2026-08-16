@@ -5,8 +5,9 @@ import UserNotFoundException from '#exceptions/user_not_found_exception'
 import { MultipartFile } from '@adonisjs/core/types/bodyparser'
 import drive from '@adonisjs/drive/services/main'
 import sharp from 'sharp'
-import { AVATAR_CONSTRAINTS } from '#validators/shared_fields'
 import { AvatarMetadataUnreadableException, AvatarResolutionTooHighException, AvatarResolutionTooLowException, AvatarUploadFailedException } from '#exceptions/avatar_exception'
+import { AVATAR_CONSTRAINTS } from '../constants/avatar.ts'
+import LessonCompleted from '#models/lesson_completion'
 
 export async function isUsernameAvailable(db: Database, value: string, field: FieldContext) {
   const query = db.from('profiles').where('username', value)
@@ -64,7 +65,7 @@ export default class UserService {
 
           const key = `avatars/${user.id}-${Date.now()}.webp`
           await drive.use().put(key, resizedBuffer)
-          user.avatar_url = await drive.use().getUrl(key)
+          user.avatarUrl = await drive.use().getUrl(key)
         } catch {
           throw new AvatarUploadFailedException()
         }
@@ -78,5 +79,53 @@ export default class UserService {
   async delete(id: string) {
     const user = await this.findById(id)
     await user.delete()
+  }
+
+  async countCompletedLessons(userId: string) {
+    const result = await LessonCompleted.query()
+      .where('user_id', userId)
+      .count('* as total')
+    return Number(result[0].$extras.total)
+  }
+
+  async getMe(userId: string) {
+    const [user, lessonsCompletedCount] = await Promise.all([
+      this.findById(userId),
+      this.countCompletedLessons(userId),
+    ])
+
+    return this.presentMe(user, lessonsCompletedCount)
+  }
+
+  async getPublicProfile(userId: string) {
+    const user = await this.findById(userId)
+    return this.presentPublicProfile(user)
+  }
+
+  private presentMe(user: User, lessonsCompletedCount: number) {
+    return {
+      id: user.id,
+      username: user.username,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      bio: user.bio,
+      avatarUrl: user.avatarUrl,
+      currentStreak: user.currentStreak,
+      longestStreak: user.longestStreak,
+      lastActivityDate: user.lastActivityDate,
+      lessonsCompletedCount,
+    }
+  }
+
+  private presentPublicProfile(user: User) {
+    return {
+      id: user.id,
+      username: user.username,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      bio: user.bio,
+      avatarUrl: user.avatarUrl,
+      currentStreak: user.currentStreak,
+    }
   }
 }

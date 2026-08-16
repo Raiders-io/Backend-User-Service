@@ -11,11 +11,11 @@ export default class UsersController {
   async showMe(ctx: HttpContext) {
     const userId = getUserId(ctx)
 
-    return this.userService.findById(userId)
+    return this.userService.getMe(userId)
   }
 
   async show({ params }: HttpContext) {
-    return this.userService.findById(params.id)
+    return this.userService.getPublicProfile(params.id)
   }
 
   async update(ctx: HttpContext) {
