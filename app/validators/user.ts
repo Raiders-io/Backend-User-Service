@@ -7,7 +7,7 @@ export const createUserValidator = vine.create({
   firstname: name(),
   lastname: name(),
   bio: bio().optional(),
-  avatar: avatar().optional()
+  avatar: avatar().optional(),
 })
 
 export const updateUserValidator = vine.create({
@@ -15,5 +15,5 @@ export const updateUserValidator = vine.create({
   firstname: name().optional(),
   lastname: name().optional(),
   bio: bio().optional(),
-  avatar: avatar().optional()
+  avatar: avatar().optional(),
 })

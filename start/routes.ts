@@ -12,6 +12,7 @@ import { middleware } from '#start/kernel'
 
 const UsersController = () => import('#controllers/users_controller')
 const FriendsController = () => import('#controllers/friends_controller')
+const LessonsController = () => import('#controllers/lessons_controller')
 
 router
   .group(() => {
@@ -20,7 +21,8 @@ router
         router.get('/me', [UsersController, 'showMe'])
         router.patch('/me', [UsersController, 'update'])
         router.delete('/me', [UsersController, 'destroy'])
-        //router.get('/me/lessons', [LessonsController, 'mine'])
+        router.get('/me/lessons/completed', [LessonsController, 'completed'])
+        router.get('/me/lessons/ongoing', [LessonsController, 'ongoing'])
       })
       .use(middleware.auth())
 

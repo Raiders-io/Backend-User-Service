@@ -2,11 +2,18 @@ import type { FieldContext } from '@vinejs/vine/types'
 import type { Database } from '@adonisjs/lucid/database'
 import User from '#models/user'
 import UserNotFoundException from '#exceptions/user_not_found_exception'
-import { MultipartFile } from '@adonisjs/core/types/bodyparser'
+import type { MultipartFile } from '@adonisjs/core/types/bodyparser'
 import drive from '@adonisjs/drive/services/main'
 import sharp from 'sharp'
-import { AvatarMetadataUnreadableException, AvatarResolutionTooHighException, AvatarResolutionTooLowException, AvatarUploadFailedException } from '#exceptions/avatar_exception'
-import { AVATAR_CONSTRAINTS } from '../constants/avatar.ts'
+
+import {
+  AvatarMetadataUnreadableException,
+  AvatarResolutionTooHighException,
+  AvatarResolutionTooLowException,
+  AvatarUploadFailedException,
+} from '#exceptions/avatar_exception'
+
+import { AVATAR_CONSTRAINTS } from '../constants/avatar_constants.ts'
 import LessonCompleted from '#models/lesson_completion'
 
 export async function isUsernameAvailable(db: Database, value: string, field: FieldContext) {
@@ -37,7 +44,7 @@ export default class UserService {
 
   async update(id: string, payload: Partial<User> & { avatar?: MultipartFile }) {
     const user = await this.findById(id)
-    const {avatar, ...rest } = payload
+    const { avatar, ...rest } = payload
 
     if (avatar) {
       const metadata = await sharp(avatar.tmpPath).metadata()
@@ -46,11 +53,17 @@ export default class UserService {
         throw new AvatarMetadataUnreadableException()
       }
 
-      if (metadata.width < AVATAR_CONSTRAINTS.MIN_SIZE || metadata.height < AVATAR_CONSTRAINTS.MIN_SIZE) {
+      if (
+        metadata.width < AVATAR_CONSTRAINTS.MIN_SIZE ||
+        metadata.height < AVATAR_CONSTRAINTS.MIN_SIZE
+      ) {
         throw new AvatarResolutionTooLowException(AVATAR_CONSTRAINTS.MIN_SIZE)
       }
 
-      if (metadata.width > AVATAR_CONSTRAINTS.MAX_SIZE || metadata.height > AVATAR_CONSTRAINTS.MAX_SIZE) {
+      if (
+        metadata.width > AVATAR_CONSTRAINTS.MAX_SIZE ||
+        metadata.height > AVATAR_CONSTRAINTS.MAX_SIZE
+      ) {
         throw new AvatarResolutionTooHighException(AVATAR_CONSTRAINTS.MAX_SIZE)
       }
 
@@ -63,13 +76,13 @@ export default class UserService {
           .webp({ quality: AVATAR_CONSTRAINTS.OUTPUT_QUALITY })
           .toBuffer()
 
-          const key = `avatars/${user.id}-${Date.now()}.webp`
-          await drive.use().put(key, resizedBuffer)
-          user.avatarUrl = await drive.use().getUrl(key)
-        } catch {
-          throw new AvatarUploadFailedException()
-        }
+        const key = `avatars/${user.id}-${Date.now()}.webp`
+        await drive.use().put(key, resizedBuffer)
+        user.avatarUrl = await drive.use().getUrl(key)
+      } catch {
+        throw new AvatarUploadFailedException()
       }
+    }
 
     user.merge(rest)
     await user.save()
@@ -82,9 +95,7 @@ export default class UserService {
   }
 
   async countCompletedLessons(userId: string) {
-    const result = await LessonCompleted.query()
-      .where('user_id', userId)
-      .count('* as total')
+    const result = await LessonCompleted.query().where('user_id', userId).count('* as total')
     return Number(result[0].$extras.total)
   }
 

@@ -1,0 +1,5 @@
+export const DEFAULT_PAGINATION = {
+  DEFAULT_PAGE: 1,
+  DEFAULT_LIMIT: 20,
+  MAX_LIMIT: 50,
+} as const
