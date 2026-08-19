@@ -10,15 +10,14 @@ class LessonService {
   }
 
   async completeLesson(userId: string, lessonId: string) {
-    // Supprime l'entrée "en cours" si elle existe
     await LessonOngoing.query().where('user_id', userId).where('lesson_id', lessonId).delete()
 
-    // Crée l'entrée "terminée"
     return LessonCompleted.create({
       userId,
       lessonId,
     })
   }
+
   async lessonsCompleted(userId: string, page: number, limit: number) {
     return LessonCompleted.query()
       .where('user_id', userId)

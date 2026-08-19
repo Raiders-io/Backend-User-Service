@@ -29,21 +29,35 @@ export default class BrokerProvider {
    */
   async start() {}
 
-  async onUserDeleted(event: ApiEvent<any>) {
+  async handleUserDeleted(event: ApiEvent<any>) {
     const userId: string = event.payload.userId
-    if (userId) {
+    if (!userId) return
 
-      const results = await Promise.allSettled([
-        UserService.delete(userId),
-        LessonService.deleteAllLessonData(userId),
-      ])
+    const results = await Promise.allSettled([
+      UserService.delete(userId),
+      LessonService.deleteAllLessonData(userId),
+    ])
 
-      results.forEach((result) => {
-        if (result.status === 'rejected') {
-          throw new MsgCriticalError('Database down')
-        }
-      })
+    const failures = results.filter(
+      (result): result is PromiseRejectedResult => result.status === 'rejected'
+    )
+
+    if (failures.length > 0) {
+      const reasons = failures.map((f) => f.reason?.message ?? f.reason).join(' | ')
+      throw new MsgCriticalError(`Failed to fully process user deletion for ${userId}: ${reasons}`)
     }
+  }
+
+  async handleLessonStarted(event: ApiEvent<any>) {
+    const { userId, lessonId } = event.payload
+    if (!userId || !lessonId) return
+    await LessonService.startLesson(userId, lessonId)
+  }
+
+  async handleLessonCompleted(event: ApiEvent<any>) {
+    const { userId, lessonId } = event.payload
+    if (!userId || !lessonId) return
+    await LessonService.completeLesson(userId, lessonId)
   }
 
   /**
@@ -51,16 +65,15 @@ export default class BrokerProvider {
    */
   async ready() {
     consume('auth.service')
-      .on('auth.user.deleted', this.onUserDeleted)
+      .on('auth.user.deleted', this.handleUserDeleted)
       .on('auth.user.created', async (event: ApiEvent<any>) => {
         const userId: string = event.payload.userId
         if (userId) await UserService.create(userId)
       })
       .start()
     consume('lesson.service')
-      .on('lesson.started', async (event: ApiEvent<any>) => {
-        
-      })
+      .on('lesson.started', this.handleLessonStarted)
+      .on('lesson.completed', this.handleLessonCompleted)
       .start()
   }
 
