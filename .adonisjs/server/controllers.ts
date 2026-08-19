@@ -5,5 +5,6 @@
 
 export const controllers = {
   Friends: () => import('#controllers/friends_controller'),
+  Lessons: () => import('#controllers/lessons_controller'),
   Users: () => import('#controllers/users_controller'),
 }

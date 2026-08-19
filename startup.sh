@@ -15,7 +15,7 @@ SESSION_DRIVER=cookie
 
 # Database
 DB_CONNECTION=pg
-DB_HOST=postgresql
+DB_HOST=postgres
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=$(openssl rand -base64 32 | tr -dc '[:alnum:]' | head -c 32)
@@ -48,6 +48,7 @@ DB_PASSWORD=${DB_PASSWORD}
 DB_DATABASE=${DB_DATABASE}
 AUTH_SERVICE_URL=http://auth-service:3333
 LIMITER_STORE=memory
+DRIVE_DISK=fs
 eof
 }
 

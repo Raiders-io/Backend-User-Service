@@ -17,7 +17,6 @@ export default class extends BaseSchema {
         .defaultTo(FriendshipStatus.PENDING)
 
       table.timestamp('created_at')
-      table.timestamp('updated_at')
     })
   }
 

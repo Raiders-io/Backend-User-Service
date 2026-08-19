@@ -21,7 +21,6 @@ router
       .group(() => {
         router.get('/me', [UsersController, 'showMe'])
         router.patch('/me', [UsersController, 'update'])
-        router.delete('/me', [UsersController, 'destroy'])
         router.get('/me/lessons/completed', [LessonsController, 'completed'])
         router.get('/me/lessons/ongoing', [LessonsController, 'ongoing'])
       })

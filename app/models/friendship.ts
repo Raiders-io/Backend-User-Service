@@ -3,6 +3,7 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import { belongsTo, column } from '@adonisjs/lucid/orm'
 import { FriendshipStatus } from '#constants/friendship_status'
 import User from '#models/user'
+import { DateTime } from 'luxon'
 
 export default class Friendship extends FriendshipSchema {
   @belongsTo(() => User)
@@ -13,4 +14,7 @@ export default class Friendship extends FriendshipSchema {
 
   @column()
   declare status: FriendshipStatus
+
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
 }

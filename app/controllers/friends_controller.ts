@@ -1,62 +1,58 @@
-import { FriendshipService } from '#services/friendship_service'
+import FriendshipService from '#services/friendship_service'
 import { getUserId } from '#services/utils_service'
-import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
-@inject()
 export default class FriendsController {
-  constructor(private friendshipService: FriendshipService) {}
-
   async index(ctx: HttpContext) {
     const userId = getUserId(ctx)
 
-    return this.friendshipService.getFriends(userId)
+    return FriendshipService.getFriends(userId)
   }
 
   async pendingRequests(ctx: HttpContext) {
     const userId = getUserId(ctx)
 
-    return this.friendshipService.getReceivedRequests(userId)
+    return FriendshipService.getReceivedRequests(userId)
   }
 
   async sentRequests(ctx: HttpContext) {
     const userId = getUserId(ctx)
 
-    return this.friendshipService.getSentRequests(userId)
+    return FriendshipService.getSentRequests(userId)
   }
 
   async sendRequest(ctx: HttpContext) {
     const { params } = ctx
     const userId = getUserId(ctx)
 
-    return this.friendshipService.sendRequest(userId, params.friendId)
+    return FriendshipService.sendRequest(userId, params.friendId)
   }
 
   async cancelRequest(ctx: HttpContext) {
     const { params } = ctx
     const userId = getUserId(ctx)
 
-    return this.friendshipService.cancelRequest(userId, params.friendId)
+    return FriendshipService.cancelRequest(userId, params.friendId)
   }
 
   async acceptRequest(ctx: HttpContext) {
     const { params } = ctx
     const userId = getUserId(ctx)
 
-    return this.friendshipService.acceptRequest(userId, params.askingId)
+    return FriendshipService.acceptRequest(userId, params.askingId)
   }
 
   async declineRequest(ctx: HttpContext) {
     const { params } = ctx
     const userId = getUserId(ctx)
 
-    return this.friendshipService.declineRequest(userId, params.askingId)
+    return FriendshipService.declineRequest(userId, params.askingId)
   }
 
   async destroy(ctx: HttpContext) {
     const { params } = ctx
     const userId = getUserId(ctx)
 
-    return this.friendshipService.unfriend(userId, params.friendId)
+    return FriendshipService.unfriend(userId, params.friendId)
   }
 }

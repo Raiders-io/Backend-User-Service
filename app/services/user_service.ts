@@ -1,8 +1,5 @@
-import type { FieldContext } from '@vinejs/vine/types'
-import type { Database } from '@adonisjs/lucid/database'
 import User from '#models/user'
 import UserNotFoundException from '#exceptions/user_not_found_exception'
-import type { MultipartFile } from '@adonisjs/core/types/bodyparser'
 import drive from '@adonisjs/drive/services/main'
 import sharp from 'sharp'
 
@@ -15,23 +12,20 @@ import {
 
 import { AVATAR_CONSTRAINTS } from '#constants/avatar_constants'
 import LessonCompleted from '#models/lesson_completion'
+import { generateUniqueTemporaryUsername } from '#services/utils_service'
+import type { updateUserValidator } from '#validators/user'
+import type { Infer } from '@vinejs/vine/types'
 
-export async function isUsernameAvailable(db: Database, value: string, field: FieldContext) {
-  const query = db.from('profiles').where('username', value)
+type UpdateUserPayload = Infer<typeof updateUserValidator>
 
-  const currentUserId = field.meta.userId
-  if (currentUserId) {
-    query.whereNot('user_id', currentUserId)
-  }
+export class UserService {
+  async create(new_id: string) {
+    const username = await generateUniqueTemporaryUsername(new_id)
 
-  const existing = await query.first()
-
-  return !existing
-}
-
-export default class UserService {
-  async create(id: string, payload: Partial<User>) {
-    return User.create({ ...payload, id })
+    return User.create({
+      id: new_id,
+      username: username,
+    })
   }
 
   async findById(id: string) {
@@ -42,7 +36,7 @@ export default class UserService {
     return user
   }
 
-  async update(id: string, payload: Partial<User> & { avatar?: MultipartFile }) {
+  async update(id: string, payload: UpdateUserPayload) {
     const user = await this.findById(id)
     const { avatar, ...rest } = payload
 
@@ -151,3 +145,5 @@ export default class UserService {
     })
   }
 }
+
+export default new UserService()

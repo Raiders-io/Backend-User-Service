@@ -9,10 +9,7 @@ export default class extends BaseSchema {
       table.uuid('user_id').notNullable().references('id').inTable('users').onDelete('CASCADE')
       table.uuid('lesson_id').notNullable()
 
-      table.timestamp('started_at').notNullable()
-
-      table.timestamp('created_at')
-      table.timestamp('updated_at')
+      table.timestamp('started_at')
     })
   }
 

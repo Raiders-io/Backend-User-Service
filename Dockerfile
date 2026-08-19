@@ -15,12 +15,12 @@ RUN npm ci
 FROM deps AS dev
 ENV NODE_ENV=development
 
-COPY ./startup.sh /
-RUN chmod +x /startup.sh
+COPY ./setup.sh /
+RUN chmod +x /setup.sh
 
 COPY . .
 
-ENTRYPOINT ["/startup.sh"]
+ENTRYPOINT ["/setup.sh"]
 CMD ["npm", "run", "dev"]
 
 # ----------------------------
@@ -36,12 +36,12 @@ RUN node ace build
 FROM base AS production
 ENV NODE_ENV=production
 
-COPY ./startup.sh /
-RUN chmod +x /startup.sh
+COPY ./setup.sh /
+RUN chmod +x /setup.sh
 
 COPY --from=build /app/build ./
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-ENTRYPOINT ["/startup.sh"]
+ENTRYPOINT ["/setup.sh"]
 CMD ["npm", "run", "prod"]

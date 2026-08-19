@@ -10,9 +10,6 @@ export default class extends BaseSchema {
       table.uuid('lesson_id').notNullable()
 
       table.timestamp('completed_at').notNullable()
-
-      table.timestamp('created_at')
-      table.timestamp('updated_at')
     })
   }
 

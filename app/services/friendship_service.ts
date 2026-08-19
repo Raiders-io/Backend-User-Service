@@ -110,3 +110,5 @@ export class FriendshipService {
       .first()
   }
 }
+
+export default new FriendshipService()

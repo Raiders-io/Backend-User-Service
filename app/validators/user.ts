@@ -1,7 +1,7 @@
 import vine from '@vinejs/vine'
 import { username, name, bio, avatar } from '#validators/shared_fields'
-import { isUsernameAvailable } from '#services/user_service'
 import { DEFAULT_PAGINATION } from '#constants/global_constants'
+import { isUsernameAvailable } from '#services/utils_service'
 
 export const createUserValidator = vine.create({
   username: username().unique(isUsernameAvailable),

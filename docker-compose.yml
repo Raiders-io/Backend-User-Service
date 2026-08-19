@@ -28,7 +28,6 @@ services:
       - "3336:3333"
     networks:
       - user-backend
-      - api-network
     restart: always
 
 

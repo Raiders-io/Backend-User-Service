@@ -1,8 +1,9 @@
 import { UserSchema } from '#database/schema'
-import { computed, hasMany } from '@adonisjs/lucid/orm'
+import { column, computed, hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import LessonCompleted from './lesson_completion.ts'
 import LessonOngoing from './lesson_ongoing.ts'
+import { DateTime } from 'luxon'
 
 export default class User extends UserSchema {
   @hasMany(() => LessonCompleted)
@@ -15,4 +16,10 @@ export default class User extends UserSchema {
   get lessonsCompletedCount() {
     return this.$extras.lessonsCompletedCount ?? undefined
   }
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
 }
