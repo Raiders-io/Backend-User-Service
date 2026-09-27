@@ -1,4 +1,3 @@
-import User from '#models/user'
 import LessonService from '#services/lesson_service'
 import UserService from '#services/user_service'
 import type { ApplicationService } from '@adonisjs/core/types'
@@ -64,14 +63,14 @@ export default class BrokerProvider {
    * The process has been started
    */
   async ready() {
-    consume('auth.service')
+    consume('auth.event')
       .on('auth.user.deleted', this.handleUserDeleted)
       .on('auth.user.created', async (event: ApiEvent<any>) => {
         const userId: string = event.payload.userId
         if (userId) await UserService.create(userId)
       })
       .start()
-    consume('lesson.service')
+    consume('lesson.event')
       .on('lesson.started', this.handleLessonStarted)
       .on('lesson.completed', this.handleLessonCompleted)
       .start()

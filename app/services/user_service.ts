@@ -78,6 +78,9 @@ export class UserService {
       }
     }
 
+    //TODO
+    //publish("user.event", user.data.update)
+
     user.merge(rest)
     await user.save()
     return user
