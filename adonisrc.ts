@@ -59,6 +59,7 @@ export default defineConfig({
       file: () => import('#providers/broker_provider'),
       environment: ['web'],
     },
+    () => import('@julr/adonisjs-prometheus/prometheus_provider')
   ],
 
   /*
