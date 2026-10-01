@@ -69,6 +69,7 @@
     "@adonisjs/session": "^8.1.0",
     "@adonisjs/shield": "^9.0.0",
     "@japa/api-client": "^3.2.1",
+    "@julr/adonisjs-prometheus": "^2.1.0",
     "@tuyau/core": "^1.2.2",
     "@vinejs/vine": "^4.4.0",
     "@yosone/broker": "^1.1.3",
