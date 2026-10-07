@@ -4,7 +4,6 @@ import { DEFAULT_PAGINATION } from '#constants/global_constants'
 import { USER_CONSTRAINTS } from '#constants/user_constants'
 import type { Database } from '@adonisjs/lucid/database'
 import type { FieldContext } from '@vinejs/vine/types'
-import { Broker, publish } from '@yosone/broker'
 
 export function getUserId(ctx: HttpContext): string {
   const userId = ctx.userId
@@ -33,9 +32,6 @@ export async function isUsernameAvailable(db: Database, value: string, field: Fi
   }
 
   const existing = await query.first()
-
-  //TODO
-  //publish("user.event"", user.username.update)
 
   return !existing
 }
