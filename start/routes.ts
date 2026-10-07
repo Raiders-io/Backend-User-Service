@@ -11,9 +11,7 @@ import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 import { searchThrottle } from './limiter.ts'
 
-const UsersController = () => import('#controllers/users_controller')
-const FriendsController = () => import('#controllers/friends_controller')
-const LessonsController = () => import('#controllers/lessons_controller')
+import { controllers } from '#generated/controllers'
 
 router
   .group(() => {
@@ -21,27 +19,28 @@ router
       .group(() => {
         router
           .group(() => {
-            router.get('/me', [UsersController, 'showMe'])
-            router.patch('/me', [UsersController, 'update'])
-            router.get('/me/lessons/completed', [LessonsController, 'completed'])
-            router.get('/me/lessons/ongoing', [LessonsController, 'ongoing'])
+            router.get('/me', [controllers.Users, 'showMe'])
+            router.patch('/me', [controllers.Users, 'update'])
+            router.get('/me/lessons/completed', [controllers.Lessons, 'completed'])
+            router.get('/me/lessons/ongoing', [controllers.Lessons, 'ongoing'])
           })
           .use(middleware.auth())
-        router.get('/search', [UsersController, 'search']).use(searchThrottle)
-        router.get('/:id', [UsersController, 'show'])
+        router.get('/search', [controllers.Users, 'search']).use(searchThrottle)
+        router.get('/:id', [controllers.Users, 'show'])
+        router.get('/:id/avatar', [controllers.Users, 'getAvatar'])
       })
       .prefix('/profile')
 
     router
       .group(() => {
-        router.get('/', [FriendsController, 'index'])
-        router.get('/requests', [FriendsController, 'pendingRequests'])
-        router.get('/requests/sent', [FriendsController, 'sentRequests'])
-        router.post('/requests/:friendId', [FriendsController, 'sendRequest'])
-        router.delete('/requests/:friendId', [FriendsController, 'cancelRequest'])
-        router.patch('/requests/:askingId/accept', [FriendsController, 'acceptRequest'])
-        router.patch('/requests/:askingId/decline', [FriendsController, 'declineRequest'])
-        router.delete('/:friendId', [FriendsController, 'destroy'])
+        router.get('/', [controllers.Friends, 'index'])
+        router.get('/requests', [controllers.Friends, 'pendingRequests'])
+        router.get('/requests/sent', [controllers.Friends, 'sentRequests'])
+        router.post('/requests/:friendId', [controllers.Friends, 'sendRequest'])
+        router.delete('/requests/:friendId', [controllers.Friends, 'cancelRequest'])
+        router.patch('/requests/:askingId/accept', [controllers.Friends, 'acceptRequest'])
+        router.patch('/requests/:askingId/decline', [controllers.Friends, 'declineRequest'])
+        router.delete('/:friendId', [controllers.Friends, 'destroy'])
       })
       .prefix('/friends/me')
       .use(middleware.auth())
