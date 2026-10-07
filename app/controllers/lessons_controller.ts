@@ -28,6 +28,7 @@ export default class LessonsController {
     const { params } = ctx
     const userId = getUserId(ctx)
 
-    return LessonService.deleteOngoingLesson(userId, params.id)
+    await LessonService.deleteOngoingLesson(userId, params.id)
+    return ctx.response.noContent()
   }
 }

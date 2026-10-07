@@ -15,6 +15,7 @@ import LessonCompleted from '#models/lesson_completion'
 import { generateUniqueTemporaryUsername } from '#services/utils_service'
 import type { updateUserValidator } from '#validators/user'
 import type { Infer } from '@vinejs/vine/types'
+import type { Me, PublicUser } from '#constants/user_constants'
 
 type UpdateUserPayload = Infer<typeof updateUserValidator>
 
@@ -110,7 +111,7 @@ export class UserService {
     return this.presentPublicProfile(user)
   }
 
-  private presentMe(user: User, lessonsCompletedCount: number) {
+  private presentMe(user: User, lessonsCompletedCount: number): Me {
     return {
       id: user.id,
       username: user.username,
@@ -125,7 +126,7 @@ export class UserService {
     }
   }
 
-  private presentPublicProfile(user: User) {
+  private presentPublicProfile(user: User): PublicUser {
     return {
       id: user.id,
       username: user.username,
