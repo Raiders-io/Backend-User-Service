@@ -24,11 +24,15 @@ router
             router.get('/lessons/completed', [controllers.Lessons, 'completed'])
             router.get('/lessons/ongoing', [controllers.Lessons, 'ongoing'])
             router
-              .post('/lessons/:id/subscribe', [controllers.Lessons, 'subscribe'])
-              .where('id', router.matchers.uuid())
-            router
-              .delete('/lessons/:id/subscribe', [controllers.Lessons, 'unsubscribe'])
-              .where('id', router.matchers.uuid())
+              .group(() => {
+                router.get('/lessons/:lessonId', [controllers.Lessons, 'status'])
+                router.post('/lessons/:lessonId/subscribe', [controllers.Lessons, 'subscribe'])
+                router.delete('/lessons/:lessonId/unsubscribe', [
+                  controllers.Lessons,
+                  'unsubscribe',
+                ])
+              })
+              .where('lessonId', router.matchers.uuid())
           })
           .prefix('/me')
           .use(middleware.auth())

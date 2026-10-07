@@ -2,7 +2,19 @@ import LessonCompleted from '#models/lesson_completion'
 import LessonOngoing from '#models/lesson_ongoing'
 import db from '@adonisjs/lucid/services/db'
 
+export type LessonStatus = 'none' | 'ongoing' | 'completed'
+
 class LessonService {
+  async getStatus(userId: string, lessonId: string): Promise<LessonStatus> {
+    const [completed, ongoing] = await Promise.all([
+      LessonCompleted.query().where('user_id', userId).where('lesson_id', lessonId).first(),
+      LessonOngoing.query().where('user_id', userId).where('lesson_id', lessonId).first(),
+    ])
+
+    if (completed) return 'completed'
+    return ongoing ? 'ongoing' : 'none'
+  }
+
   async startLesson(userId: string, lessonId: string) {
     return LessonOngoing.firstOrCreate({
       userId,

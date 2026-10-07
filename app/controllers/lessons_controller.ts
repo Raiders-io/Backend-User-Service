@@ -21,14 +21,21 @@ export default class LessonsController {
     const { params } = ctx
     const userId = getUserId(ctx)
 
-    return LessonService.startLesson(userId, params.id)
+    return LessonService.startLesson(userId, params.lessonId)
   }
 
   async unsubscribe(ctx: HttpContext) {
     const { params } = ctx
     const userId = getUserId(ctx)
 
-    await LessonService.deleteOngoingLesson(userId, params.id)
+    await LessonService.deleteOngoingLesson(userId, params.lessonId)
     return ctx.response.noContent()
+  }
+
+  async status(ctx: HttpContext) {
+    const { params } = ctx
+    const userId = getUserId(ctx)
+
+    return await LessonService.getStatus(userId, params.lessonId)
   }
 }
