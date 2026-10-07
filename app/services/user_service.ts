@@ -16,6 +16,8 @@ import { generateUniqueTemporaryUsername } from '#services/utils_service'
 import type { updateUserValidator } from '#validators/user'
 import type { Infer } from '@vinejs/vine/types'
 import type { Me, PublicUser } from '#constants/user_constants'
+import type { UserUpdatedEvent } from '#constants/events'
+import { publish } from '@yosone/broker'
 
 type UpdateUserPayload = Infer<typeof updateUserValidator>
 
@@ -35,6 +37,16 @@ export class UserService {
       throw new UserNotFoundException()
     }
     return user
+  }
+
+  async publishUserUpdated(user: User) {
+    const event: UserUpdatedEvent = {
+      type: 'user.data.updated',
+      date: new Date(),
+      payload: { user: this.presentPublicProfile(user) },
+    }
+
+    await publish(event.type, event)
   }
 
   async update(id: string, payload: UpdateUserPayload) {
@@ -79,12 +91,12 @@ export class UserService {
       }
     }
 
-    //TODO
-    //publish("user.event", user.data.update)
-
     user.merge(rest)
     await user.save()
-    return user
+
+    await this.publishUserUpdated(user)
+
+    return this.presentMe(user, await this.countCompletedLessons(user.id))
   }
 
   async delete(id: string) {

@@ -1,6 +1,12 @@
-export const STREAM_NAME: string = 'lesson.service'
+import type { Me, PublicUser } from './user_constants.ts'
 
-export interface UserUpdated {
-  id: string
-  user: any
+export const STREAM_NAME: string = 'user.service'
+
+export interface UserUpdatedEvent {
+  type: 'user.data.updated'
+  date: Date
+  payload: {
+    user: PublicUser
+  }
 }
+
