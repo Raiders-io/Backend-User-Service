@@ -16,4 +16,18 @@ export default class LessonsController {
 
     return LessonService.lessonsOngoing(userId, page, limit)
   }
+
+  async subscribe(ctx: HttpContext) {
+    const { params } = ctx
+    const userId = getUserId(ctx)
+
+    return LessonService.startLesson(userId, params.id)
+  }
+
+  async unsubscribe(ctx: HttpContext) {
+    const { params } = ctx
+    const userId = getUserId(ctx)
+
+    return LessonService.deleteOngoingLesson(userId, params.id)
+  }
 }

@@ -1,20 +1,23 @@
 import LessonCompleted from '#models/lesson_completion'
 import LessonOngoing from '#models/lesson_ongoing'
+import db from '@adonisjs/lucid/services/db'
 
 class LessonService {
   async startLesson(userId: string, lessonId: string) {
-    return LessonOngoing.create({
+    return LessonOngoing.firstOrCreate({
       userId,
       lessonId,
     })
   }
 
   async completeLesson(userId: string, lessonId: string) {
-    await LessonOngoing.query().where('user_id', userId).where('lesson_id', lessonId).delete()
+    return db.transaction(async (trx) => {
+      await LessonOngoing.query({ client: trx })
+        .where('user_id', userId)
+        .where('lesson_id', lessonId)
+        .delete()
 
-    return LessonCompleted.create({
-      userId,
-      lessonId,
+      return LessonCompleted.firstOrCreate({ userId, lessonId }, {}, { client: trx })
     })
   }
 
