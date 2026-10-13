@@ -2,8 +2,8 @@ import UserIdNotFoundException from '#exceptions/user_id_not_found_exception'
 import type { HttpContext } from '@adonisjs/core/http'
 import { DEFAULT_PAGINATION } from '#constants/global_constants'
 import { USER_CONSTRAINTS } from '#constants/user_constants'
-import type { Database } from '@adonisjs/lucid/database'
 import type { FieldContext } from '@vinejs/vine/types'
+import User from '#models/user'
 
 export function getUserId(ctx: HttpContext): string {
   const userId = ctx.userId
@@ -23,16 +23,11 @@ export function getPaginationParams(ctx: HttpContext) {
   return { page, limit }
 }
 
-export async function isUsernameAvailable(db: Database, value: string, field: FieldContext) {
-  const query = db.from('profiles').where('username', value)
-
-  const currentUserId = field.meta.userId
-  if (currentUserId) {
-    query.whereNot('user_id', currentUserId)
-  }
+export async function isUsernameAvailable(value: string, field: FieldContext) {
+  const query = User.query().where('username', value)
+  console.log(query)
 
   const existing = await query.first()
-
   return !existing
 }
 

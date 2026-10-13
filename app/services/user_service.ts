@@ -33,7 +33,7 @@ export class UserService {
   async findById(id: string) {
     const user = await User.find(id)
     if (!user) {
-      throw new UserNotFoundException()
+      return await this.create(id)
     }
     return user
   }
@@ -103,8 +103,12 @@ export class UserService {
   }
 
   async countCompletedLessons(userId: string) {
-    const result = await LessonCompleted.query().where('user_id', userId).count('* as total')
-    return Number(result[0].$extras.total)
+    try {
+      const result = await LessonCompleted.query().where('user_id', userId).count('* as total')
+      return Number(result[0].$extras.total)
+    } catch {
+      return 0
+    }
   }
 
   async getMe(userId: string) {
@@ -128,7 +132,6 @@ export class UserService {
       firstname: user.firstname,
       lastname: user.lastname,
       bio: user.bio,
-      avatarUrl: user.avatarUrl,
       currentStreak: user.currentStreak,
       longestStreak: user.longestStreak,
       lastActivityDate: user.lastActivityDate,
@@ -143,7 +146,6 @@ export class UserService {
       firstname: user.firstname,
       lastname: user.lastname,
       bio: user.bio,
-      avatarUrl: user.avatarUrl,
       currentStreak: user.currentStreak,
     }
   }

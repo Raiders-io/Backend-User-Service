@@ -25,8 +25,9 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "3336:3333"
+      - "3333:3333"
     networks:
+      - api-network
       - user-backend
     restart: always
 

@@ -27,7 +27,7 @@ export default class UsersController {
   }
 
   async getAvatar({ params, response }: HttpContext) {
-    const user = await UserService.getPublicProfile(params.id)
+    const user = await UserService.findById(params.id)
 
     if (!user) {
       throw new UserIdNotFoundException()

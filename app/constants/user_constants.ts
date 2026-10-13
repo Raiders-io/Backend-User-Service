@@ -11,7 +11,7 @@ export const USER_CONSTRAINTS = {
 
 export type PublicUser = Pick<
   User,
-  'id' | 'username' | 'firstname' | 'lastname' | 'bio' | 'avatarUrl' | 'currentStreak'
+  'id' | 'username' | 'firstname' | 'lastname' | 'bio' | 'currentStreak'
 >
 
 export type Me = PublicUser &

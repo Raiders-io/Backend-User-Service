@@ -1,7 +1,7 @@
 import LessonService from '#services/lesson_service'
 import UserService from '#services/user_service'
 import type { ApplicationService } from '@adonisjs/core/types'
-import { type ApiEvent, Broker, consume, MsgCriticalError, publish } from '@yosone/broker'
+import { type ApiEvent, Broker, consume, MsgCriticalError } from '@yosone/broker'
 
 export default class BrokerProvider {
   constructor(protected app: ApplicationService) {}
