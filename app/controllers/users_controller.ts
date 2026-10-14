@@ -32,24 +32,20 @@ export default class UsersController {
   }
 
   async getAvatar({ params, response }: HttpContext) {
-    const user = await UserService.findById(params.id)
+    const user = await UserService.findExistingById(params.id)
 
     if (!user) {
       throw new UserIdNotFoundException()
     }
 
     const path = user.avatarUrl
-
-    if (!path) {
-      throw new UserAvatarNotFoundException()
-    }
-
     const disk = drive.use()
 
-    if (!(await disk.exists(path))) {
+    if (!path || !(await disk.exists(path))) {
       throw new UserAvatarNotFoundException()
     }
 
+    response.header('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800')
     return response.redirect(await drive.use().getUrl(path))
   }
 

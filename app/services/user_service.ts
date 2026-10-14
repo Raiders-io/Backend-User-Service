@@ -28,6 +28,10 @@ export class UserService {
     })
   }
 
+  async findExistingById(id: string) {
+    return User.query().where('id', id).withCount('lesson_completions').first()
+  }
+
   async findById(id: string) {
     const user = await User.query().where('id', id).withCount('lesson_completions').first()
 
@@ -86,7 +90,7 @@ export class UserService {
 
         const key = `avatars/${user.id}-${Date.now()}.webp`
         await drive.use().put(key, resizedBuffer)
-        user.avatarUrl = await drive.use().getUrl(key)
+        user.avatarUrl = key
       } catch {
         throw new AvatarUploadFailedException()
       }
@@ -122,7 +126,7 @@ export class UserService {
   }
 
   async getPublicProfile(userId: string) {
-    const user = await this.findById(userId)
+    const user = await this.findExistingById(userId)
     if (!user) return null
 
     return this.presentPublicProfile(user)
