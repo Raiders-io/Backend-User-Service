@@ -38,6 +38,7 @@ router
           .use(middleware.auth())
         router.get('/search', [controllers.Users, 'search']).use(searchThrottle)
         router.get('/:id', [controllers.Users, 'show']).where('id', router.matchers.uuid())
+        router.get('/u/:username', [controllers.Users, 'showByUsername'])
         router
           .get('/:id/avatar', [controllers.Users, 'getAvatar'])
           .where('id', router.matchers.uuid())

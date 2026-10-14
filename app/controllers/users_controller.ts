@@ -18,6 +18,11 @@ export default class UsersController {
     return UserService.getPublicProfile(params.id)
   }
 
+  async showByUsername({ params, response }: HttpContext) {
+    const user = await UserService.findByUsername(params.username)
+    return response.ok(user)
+  }
+
   async update(ctx: HttpContext) {
     const { request } = ctx
     const userId = getUserId(ctx)

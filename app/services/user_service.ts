@@ -1,5 +1,4 @@
 import User from '#models/user'
-import UserNotFoundException from '#exceptions/user_not_found_exception'
 import drive from '@adonisjs/drive/services/main'
 import sharp from 'sharp'
 
@@ -11,7 +10,6 @@ import {
 } from '#exceptions/avatar_exception'
 
 import { AVATAR_CONSTRAINTS } from '#constants/avatar_constants'
-import LessonCompleted from '#models/lesson_completion'
 import { generateUniqueTemporaryUsername } from '#services/utils_service'
 import type { updateUserValidator } from '#validators/user'
 import type { Infer } from '@vinejs/vine/types'
@@ -31,11 +29,25 @@ export class UserService {
   }
 
   async findById(id: string) {
-    const user = await User.find(id)
+    const user = await User.query().where('id', id).withCount('lesson_completions').first()
+
     if (!user) {
       return await this.create(id)
     }
     return user
+  }
+
+  async findByUsername(username: string): Promise<PublicUser | null> {
+    const user = await User.query()
+      .where('username', username)
+      .withCount('lesson_completions')
+      .first()
+
+    if (!user) {
+      return null
+    }
+
+    return this.presentPublicProfile(user)
   }
 
   async update(id: string, payload: UpdateUserPayload) {
@@ -83,6 +95,8 @@ export class UserService {
     user.merge(rest)
     await user.save()
 
+    await user.loadCount('lesson_completions')
+
     await eventPublisher.publish('data.updated', {
       user: this.presentPublicProfile(user),
     })
@@ -94,7 +108,7 @@ export class UserService {
       })
     }
 
-    return this.presentMe(user, await this.countCompletedLessons(user.id))
+    return this.presentMe(user)
   }
 
   async delete(id: string) {
@@ -102,30 +116,19 @@ export class UserService {
     await user.delete()
   }
 
-  async countCompletedLessons(userId: string) {
-    try {
-      const result = await LessonCompleted.query().where('user_id', userId).count('* as total')
-      return Number(result[0].$extras.total)
-    } catch {
-      return 0
-    }
-  }
-
   async getMe(userId: string) {
-    const [user, lessonsCompletedCount] = await Promise.all([
-      this.findById(userId),
-      this.countCompletedLessons(userId),
-    ])
-
-    return this.presentMe(user, lessonsCompletedCount)
+    const user = await this.findById(userId)
+    return this.presentMe(user)
   }
 
   async getPublicProfile(userId: string) {
     const user = await this.findById(userId)
+    if (!user) return null
+
     return this.presentPublicProfile(user)
   }
 
-  private presentMe(user: User, lessonsCompletedCount: number): Me {
+  private presentMe(user: User): Me {
     return {
       id: user.id,
       username: user.username,
@@ -135,7 +138,7 @@ export class UserService {
       currentStreak: user.currentStreak,
       longestStreak: user.longestStreak,
       lastActivityDate: user.lastActivityDate,
-      lessonsCompletedCount,
+      lessonsCompletedCount: Number(user.lessonsCompletedCount || 0),
     }
   }
 
@@ -147,18 +150,26 @@ export class UserService {
       lastname: user.lastname,
       bio: user.bio,
       currentStreak: user.currentStreak,
+      longestStreak: user.longestStreak,
+      lessonsCompletedCount: Number(user.lessonsCompletedCount || 0),
     }
   }
 
   async searchByUsername(query: string, page: number, limit: number) {
-    const result = await User.query()
+    const paginatedUsers = await User.query()
       .whereILike('username', `${query}%`)
+      .withCount('lesson_completions')
       .orderBy('username', 'asc')
       .paginate(page, limit)
 
-    return result.serialize({
-      fields: ['id', 'username', 'firstname', 'lastname', 'avatar_url'],
+    const serializedData = paginatedUsers.all().map((user) => {
+      return this.presentPublicProfile(user)
     })
+
+    return {
+      meta: paginatedUsers.getMeta(),
+      data: serializedData,
+    }
   }
 }
 
