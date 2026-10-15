@@ -1,118 +1,100 @@
 import User from '#models/user'
+import db from '@adonisjs/lucid/services/db'
 import drive from '@adonisjs/drive/services/main'
 import sharp from 'sharp'
 
+import { AVATAR_CONSTRAINTS, BACKGROUND_CONSTRAINTS } from '#constants/assets_constants'
+import { FriendshipStatus } from '#constants/friendship_status'
+import { generateUniqueTemporaryUsername } from '#services/utils_service'
+import eventPublisher from '#constants/events'
+import type { updateUserValidator } from '#validators/user'
+import type { Infer } from '@vinejs/vine/types'
+import type { Me, PublicUser } from '#constants/user_constants'
 import {
   AvatarMetadataUnreadableException,
   AvatarResolutionTooHighException,
   AvatarResolutionTooLowException,
-  AvatarUploadFailedException,
-} from '#exceptions/avatar_exception'
-
-import { AVATAR_CONSTRAINTS } from '#constants/avatar_constants'
-import { generateUniqueTemporaryUsername } from '#services/utils_service'
-import type { updateUserValidator } from '#validators/user'
-import type { Infer } from '@vinejs/vine/types'
-import type { Me, PublicUser } from '#constants/user_constants'
-import eventPublisher from '#constants/events'
+  AssetUploadFailedException,
+  BackgroundMetadataUnreadableException,
+  BackgroundResolutionTooHighException,
+  BackgroundResolutionTooLowException,
+} from '#exceptions/assets_exception'
 
 type UpdateUserPayload = Infer<typeof updateUserValidator>
+type AvatarFile = NonNullable<UpdateUserPayload['avatar']>
+type BackgroundFile = NonNullable<UpdateUserPayload['background']>
+
+const FRIENDS_COUNT_SQL = `(
+  select count(distinct case when f.user_id = users.id then f.friend_id else f.user_id end)
+  from friendships f
+  where f.status = ?
+    and (f.user_id = users.id or f.friend_id = users.id)
+) as "friendsCount"`
 
 export class UserService {
-  async create(new_id: string) {
-    const username = await generateUniqueTemporaryUsername(new_id)
-
-    return User.create({
-      id: new_id,
-      username: username,
-    })
+  async create(id: string) {
+    const username = await generateUniqueTemporaryUsername(id)
+    await User.create({ id, username })
+    return this.findExistingById(id) as Promise<User>
   }
 
   async findExistingById(id: string) {
-    return User.query().where('id', id).withCount('lesson_completions').first()
+    return this.query().where('users.id', id).first()
   }
 
   async findById(id: string) {
-    const user = await User.query().where('id', id).withCount('lesson_completions').first()
-
-    if (!user) {
-      return await this.create(id)
-    }
-    return user
+    return (await this.findExistingById(id)) ?? this.create(id)
   }
 
   async findByUsername(username: string): Promise<PublicUser | null> {
-    const user = await User.query()
-      .where('username', username)
-      .withCount('lesson_completions')
-      .first()
-
-    if (!user) {
-      return null
-    }
-
-    return this.presentPublicProfile(user)
+    const user = await this.query().where('users.username', username).first()
+    return user ? this.toPublic(user) : null
   }
 
-  async update(id: string, payload: UpdateUserPayload) {
-    const user = await this.findById(id)
+  async searchByUsername(search: string, page: number, limit: number) {
+    const result = await this.query()
+      .whereILike('users.username', `${search}%`)
+      .orderBy('users.username', 'asc')
+      .paginate(page, limit)
+
+    return {
+      meta: result.getMeta(),
+      data: result.all().map((user) => this.toPublic(user)),
+    }
+  }
+
+  async getMe(id: string): Promise<Me> {
+    return this.toMe(await this.findById(id))
+  }
+
+  async getPublicProfile(id: string): Promise<PublicUser | null> {
+    const user = await this.findExistingById(id)
+    return user ? this.toPublic(user) : null
+  }
+
+  async update(id: string, payload: UpdateUserPayload): Promise<Me> {
     const { avatar, ...rest } = payload
+    const user = await this.findById(id)
 
     if (avatar) {
-      const metadata = await sharp(avatar.tmpPath).metadata()
-
-      if (!metadata.width || !metadata.height) {
-        throw new AvatarMetadataUnreadableException()
-      }
-
-      if (
-        metadata.width < AVATAR_CONSTRAINTS.MIN_SIZE ||
-        metadata.height < AVATAR_CONSTRAINTS.MIN_SIZE
-      ) {
-        throw new AvatarResolutionTooLowException(AVATAR_CONSTRAINTS.MIN_SIZE)
-      }
-
-      if (
-        metadata.width > AVATAR_CONSTRAINTS.MAX_SIZE ||
-        metadata.height > AVATAR_CONSTRAINTS.MAX_SIZE
-      ) {
-        throw new AvatarResolutionTooHighException(AVATAR_CONSTRAINTS.MAX_SIZE)
-      }
-
-      try {
-        const resizedBuffer = await sharp(avatar.tmpPath)
-          .resize(AVATAR_CONSTRAINTS.OUTPUT_SIZE, AVATAR_CONSTRAINTS.OUTPUT_SIZE, {
-            fit: 'cover',
-            position: 'center',
-          })
-          .webp({ quality: AVATAR_CONSTRAINTS.OUTPUT_QUALITY })
-          .toBuffer()
-
-        const key = `avatars/${user.id}-${Date.now()}.webp`
-        await drive.use().put(key, resizedBuffer)
-        user.avatarUrl = key
-      } catch {
-        throw new AvatarUploadFailedException()
-      }
+      user.avatarUrl = await this.uploadAvatar(user.id, avatar)
     }
 
     user.merge(rest)
     await user.save()
 
-    await user.loadCount('lesson_completions')
+    const fresh = (await this.findExistingById(id))!
 
-    await eventPublisher.publish('data.updated', {
-      user: this.presentPublicProfile(user),
-    })
+    await eventPublisher.publish('data.updated', { user: this.toPublic(fresh) })
 
     if (rest.username) {
       await eventPublisher.publish('username.updated', {
-        userId: user.id,
-        username: user.username,
+        userId: fresh.id,
+        username: fresh.username,
       })
     }
 
-    return this.presentMe(user)
+    return this.toMe(fresh)
   }
 
   async delete(id: string) {
@@ -120,19 +102,61 @@ export class UserService {
     await user.delete()
   }
 
-  async getMe(userId: string) {
-    const user = await this.findById(userId)
-    return this.presentMe(user)
+  private query() {
+    return User.query()
+      .select('users.*', db.raw(FRIENDS_COUNT_SQL, [FriendshipStatus.ACCEPTED]))
+      .withCount('lesson_completions', (q) => q.as('lessonsCompletedCount'))
   }
 
-  async getPublicProfile(userId: string) {
-    const user = await this.findExistingById(userId)
-    if (!user) return null
+  private async uploadAvatar(userId: string, avatar: AvatarFile): Promise<string> {
+    const { MIN_SIZE, MAX_SIZE, OUTPUT_SIZE, OUTPUT_QUALITY } = AVATAR_CONSTRAINTS
+    const { width, height } = await sharp(avatar.tmpPath).metadata()
 
-    return this.presentPublicProfile(user)
+    if (!width || !height) throw new AvatarMetadataUnreadableException()
+    if (width < MIN_SIZE || height < MIN_SIZE) throw new AvatarResolutionTooLowException(MIN_SIZE)
+    if (width > MAX_SIZE || height > MAX_SIZE) throw new AvatarResolutionTooHighException(MAX_SIZE)
+
+    try {
+      const buffer = await sharp(avatar.tmpPath)
+        .resize(OUTPUT_SIZE, OUTPUT_SIZE, { fit: 'cover', position: 'center' })
+        .webp({ quality: OUTPUT_QUALITY })
+        .toBuffer()
+
+      const key = `avatars/${userId}-${Date.now()}.webp`
+      await drive.use().put(key, buffer)
+      return key
+    } catch {
+      throw new AssetUploadFailedException()
+    }
   }
 
-  private presentMe(user: User): Me {
+  private async uploadBackground(userId: string, background: BackgroundFile): Promise<string> {
+    const { MIN_WIDTH, MIN_HEIGHT, MAX_SIZE, OUTPUT_WIDTH, OUTPUT_HEIGHT, OUTPUT_QUALITY } =
+      BACKGROUND_CONSTRAINTS
+
+    const { width, height } = await sharp(background.tmpPath).metadata()
+
+    if (!width || !height) throw new BackgroundMetadataUnreadableException()
+    if (width < MIN_WIDTH || height < MIN_HEIGHT)
+      throw new BackgroundResolutionTooLowException(MIN_WIDTH)
+    if (width > MAX_SIZE || height > MAX_SIZE)
+      throw new BackgroundResolutionTooHighException(MAX_SIZE)
+
+    try {
+      const buffer = await sharp(background.tmpPath)
+        .resize(OUTPUT_WIDTH, OUTPUT_HEIGHT, { fit: 'cover', position: 'center' })
+        .webp({ quality: OUTPUT_QUALITY })
+        .toBuffer()
+
+      const key = `backgrounds/${userId}-${Date.now()}.webp`
+      await drive.use().put(key, buffer)
+      return key
+    } catch {
+      throw new AssetUploadFailedException()
+    }
+  }
+
+  private toPublic(user: User): PublicUser {
     return {
       id: user.id,
       username: user.username,
@@ -141,39 +165,13 @@ export class UserService {
       bio: user.bio,
       currentStreak: user.currentStreak,
       longestStreak: user.longestStreak,
-      lastActivityDate: user.lastActivityDate,
-      lessonsCompletedCount: Number(user.lessonsCompletedCount || 0),
+      lessonsCompletedCount: user.lessonsCompletedCount,
+      friendsCount: user.friendsCount,
     }
   }
 
-  private presentPublicProfile(user: User): PublicUser {
-    return {
-      id: user.id,
-      username: user.username,
-      firstname: user.firstname,
-      lastname: user.lastname,
-      bio: user.bio,
-      currentStreak: user.currentStreak,
-      longestStreak: user.longestStreak,
-      lessonsCompletedCount: Number(user.lessonsCompletedCount || 0),
-    }
-  }
-
-  async searchByUsername(query: string, page: number, limit: number) {
-    const paginatedUsers = await User.query()
-      .whereILike('username', `${query}%`)
-      .withCount('lesson_completions')
-      .orderBy('username', 'asc')
-      .paginate(page, limit)
-
-    const serializedData = paginatedUsers.all().map((user) => {
-      return this.presentPublicProfile(user)
-    })
-
-    return {
-      meta: paginatedUsers.getMeta(),
-      data: serializedData,
-    }
+  private toMe(user: User): Me {
+    return { ...this.toPublic(user), lastActivityDate: user.lastActivityDate }
   }
 }
 

@@ -1,5 +1,5 @@
 import vine from '@vinejs/vine'
-import { username, name, bio, avatar } from '#validators/shared_fields'
+import { username, name, bio, avatar, background } from '#validators/shared_fields'
 import { DEFAULT_PAGINATION } from '#constants/global_constants'
 import { isUsernameAvailable } from '#services/utils_service'
 
@@ -9,6 +9,7 @@ export const createUserValidator = vine.create({
   lastname: name(),
   bio: bio().optional(),
   avatar: avatar().optional(),
+  background: background().optional(),
 })
 
 export const updateUserValidator = vine.create({
@@ -17,6 +18,7 @@ export const updateUserValidator = vine.create({
   lastname: name().optional(),
   bio: bio().optional(),
   avatar: avatar().optional(),
+  background: background().optional(),
 })
 
 export const searchUsersValidator = vine.create({

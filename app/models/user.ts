@@ -14,7 +14,12 @@ export default class User extends UserSchema {
 
   @computed()
   get lessonsCompletedCount() {
-    return this.$extras.lessonsCompletedCount ?? undefined
+    return Number(this.$extras.lessonsCompletedCount) ?? 0
+  }
+
+  @computed()
+  get friendsCount() {
+    return Number(this.$extras.friendsCount ?? 0)
   }
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })

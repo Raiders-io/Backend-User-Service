@@ -30,10 +30,11 @@ export class FriendshipService {
     })
   }
 
-  async acceptRequest(userId: string, friendId: string) {
+  async acceptRequest(currentUserId: string, requesterId: string) {
     const friendship = await Friendship.query()
-      .where('user_id', userId)
-      .where('friend_id', friendId)
+      .where((query) => {
+        query.where('user_id', requesterId).where('friend_id', currentUserId)
+      })
       .where('status', FriendshipStatus.PENDING)
       .firstOrFail()
 

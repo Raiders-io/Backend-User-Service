@@ -1,5 +1,5 @@
 import { DEFAULT_PAGINATION } from '#constants/global_constants'
-import UserAvatarNotFoundException from '#exceptions/user_avatar_not_found_exception'
+import UserAssetNotFoundException from '#exceptions/assets_exception'
 import UserIdNotFoundException from '#exceptions/user_id_not_found_exception'
 import UserService from '#services/user_service'
 import { getUserId } from '#services/utils_service'
@@ -42,11 +42,35 @@ export default class UsersController {
     const disk = drive.use()
 
     if (!path || !(await disk.exists(path))) {
-      throw new UserAvatarNotFoundException()
+      throw new UserAssetNotFoundException()
     }
 
-    response.header('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800')
-    return response.redirect(await drive.use().getUrl(path))
+    response.type(path)
+    response.header('Cache-Control', 'public, max-scale=86400, stale-while-revalidate=604800')
+
+    const stream = await disk.getStream(path)
+    return response.stream(stream)
+  }
+
+  async getBackground({ params, response }: HttpContext) {
+    const user = await UserService.findExistingById(params.id)
+
+    if (!user) {
+      throw new UserIdNotFoundException()
+    }
+
+    const path = user.backgroundUrl
+    const disk = drive.use()
+
+    if (!path || !(await disk.exists(path))) {
+      throw new UserAssetNotFoundException()
+    }
+
+    response.type(path)
+    response.header('Cache-Control', 'public, max-scale=86400, stale-while-revalidate=604800')
+
+    const stream = await disk.getStream(path)
+    return response.stream(stream)
   }
 
   async search(ctx: HttpContext) {

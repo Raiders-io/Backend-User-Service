@@ -18,6 +18,12 @@ export const name = () => vine.string().trim().maxLength(USER_CONSTRAINTS.NAME_M
 
 export const avatar = () =>
   vine.file({
-    size: `${USER_CONSTRAINTS.AVATAR_MAX_SIZE_MB}mb`,
-    extnames: [...USER_CONSTRAINTS.AVATAR_ALLOWED_EXTENSIONS],
+    size: `${USER_CONSTRAINTS.ASSETS_MAX_SIZE_MB}mb`,
+    extnames: [...USER_CONSTRAINTS.ASSETS_ALLOWED_EXTENSIONS],
+  })
+
+export const background = () =>
+  vine.file({
+    size: `${USER_CONSTRAINTS.ASSETS_MAX_SIZE_MB}mb`,
+    extnames: [...USER_CONSTRAINTS.ASSETS_ALLOWED_EXTENSIONS],
   })

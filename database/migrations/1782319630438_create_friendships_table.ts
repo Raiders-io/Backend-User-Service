@@ -16,6 +16,9 @@ export default class extends BaseSchema {
         .notNullable()
         .defaultTo(FriendshipStatus.PENDING)
 
+      table.index(['user_id', 'friend_id'])
+      table.index(['friend_id', 'user_id'])
+
       table.timestamp('created_at')
     })
   }

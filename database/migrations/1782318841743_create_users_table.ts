@@ -9,10 +9,11 @@ export default class extends BaseSchema {
       table.string('username').unique().notNullable()
       table.string('firstname').nullable()
       table.string('lastname').nullable()
-      table.string('bio')
+      table.text('bio')
       table.timestamp('created_at')
       table.timestamp('updated_at')
       table.string('avatar_url').nullable()
+      table.string('background_url').nullable()
 
       table.integer('current_streak').notNullable().defaultTo(0)
       table.integer('longest_streak').notNullable().defaultTo(0)
