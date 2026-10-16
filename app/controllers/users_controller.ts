@@ -1,6 +1,7 @@
 import { DEFAULT_PAGINATION } from '#constants/global_constants'
 import UserAssetNotFoundException from '#exceptions/assets_exception'
 import UserIdNotFoundException from '#exceptions/user_id_not_found_exception'
+import UserNotFoundException from '#exceptions/user_not_found_exception'
 import UserService from '#services/user_service'
 import { getUserId } from '#services/utils_service'
 import { searchUsersValidator, updateUserValidator } from '#validators/user'
@@ -14,12 +15,19 @@ export default class UsersController {
     return UserService.getMe(userId)
   }
 
-  async show({ params }: HttpContext) {
-    return UserService.getPublicProfile(params.id)
+  async show({ params, response }: HttpContext) {
+    const user = await UserService.findById(params.username)
+    if (!user) {
+      throw new UserNotFoundException()
+    }
+    return response.ok(user)
   }
 
   async showByUsername({ params, response }: HttpContext) {
     const user = await UserService.findByUsername(params.username)
+    if (!user) {
+      throw new UserNotFoundException()
+    }
     return response.ok(user)
   }
 
@@ -32,10 +40,10 @@ export default class UsersController {
   }
 
   async getAvatar({ params, response }: HttpContext) {
-    const user = await UserService.findExistingById(params.id)
+    const user = await UserService.findById(params.id)
 
     if (!user) {
-      throw new UserIdNotFoundException()
+      throw new UserNotFoundException()
     }
 
     const path = user.avatarUrl
@@ -53,10 +61,10 @@ export default class UsersController {
   }
 
   async getBackground({ params, response }: HttpContext) {
-    const user = await UserService.findExistingById(params.id)
+    const user = await UserService.findById(params.id)
 
     if (!user) {
-      throw new UserIdNotFoundException()
+      throw new UserNotFoundException()
     }
 
     const path = user.backgroundUrl

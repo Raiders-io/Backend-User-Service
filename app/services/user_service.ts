@@ -32,18 +32,23 @@ const FRIENDS_COUNT_SQL = `(
 ) as "friendsCount"`
 
 export class UserService {
-  async create(id: string) {
-    const username = await generateUniqueTemporaryUsername(id)
-    await User.create({ id, username })
-    return this.findExistingById(id) as Promise<User>
-  }
-
-  async findExistingById(id: string) {
+  async queryById(id: string) {
     return this.query().where('users.id', id).first()
   }
 
+  async create(id: string) {
+    const username = await generateUniqueTemporaryUsername(id)
+    await User.create({ id, username })
+    return this.queryById(id) as Promise<User>
+  }
+
+  async findEnsuredById(id: string) {
+    return (await this.queryById(id)) ?? this.create(id)
+  }
+
   async findById(id: string) {
-    return (await this.findExistingById(id)) ?? this.create(id)
+    const user = await this.queryById(id)
+    return user ? this.toPublic(user) : null
   }
 
   async findByUsername(username: string): Promise<PublicUser | null> {
@@ -64,17 +69,12 @@ export class UserService {
   }
 
   async getMe(id: string): Promise<Me> {
-    return this.toMe(await this.findById(id))
-  }
-
-  async getPublicProfile(id: string): Promise<PublicUser | null> {
-    const user = await this.findExistingById(id)
-    return user ? this.toPublic(user) : null
+    return this.toMe(await this.findEnsuredById(id))
   }
 
   async update(id: string, payload: UpdateUserPayload): Promise<Me> {
     const { avatar, background, ...rest } = payload
-    const user = await this.findById(id)
+    const user = await this.findEnsuredById(id)
 
     if (avatar) {
       user.avatarUrl = await this.uploadAvatar(user.id, avatar)
@@ -88,7 +88,7 @@ export class UserService {
 
     await user.save()
 
-    const fresh = (await this.findExistingById(id))!
+    const fresh = (await this.queryById(id))!
 
     await eventPublisher.publish('data.updated', { user: this.toPublic(fresh) })
 
@@ -103,7 +103,7 @@ export class UserService {
   }
 
   async delete(id: string) {
-    const user = await this.findById(id)
+    const user = await this.findEnsuredById(id)
     await user.delete()
   }
 
