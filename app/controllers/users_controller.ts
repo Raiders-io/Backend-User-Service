@@ -16,7 +16,7 @@ export default class UsersController {
   }
 
   async show({ params, response }: HttpContext) {
-    const user = await UserService.findById(params.username)
+    const user = await UserService.findById(params.id)
     if (!user) {
       throw new UserNotFoundException()
     }
