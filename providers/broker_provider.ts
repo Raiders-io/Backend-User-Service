@@ -9,14 +9,7 @@ export default class BrokerProvider {
   /**
    * Register bindings to the container
    */
-  register() {
-    Broker.init({
-      group: 'user-service',
-      consumer: 'user-consumer',
-      redisUrl: process.env.REDIS_URL || 'redis://redis:6380',
-      logLevel: 4,
-    })
-  }
+  register() {}
 
   /**
    * The container bindings have booted
@@ -26,7 +19,14 @@ export default class BrokerProvider {
   /**
    * The application has been booted
    */
-  async start() {}
+  async start() {
+    Broker.init({
+      group: 'user-service',
+      consumer: 'user-consumer',
+      redisUrl: process.env.REDIS_URL || 'redis://redis:6379',
+      logLevel: 4,
+    })
+  }
 
   async handleUserDeleted(event: ApiEvent<any>) {
     const userId: string = event.payload.userId
@@ -80,6 +80,6 @@ export default class BrokerProvider {
    * Preparing to shutdown the app
    */
   async shutdown() {
-    Broker.disconnect()
+    Broker.shutdown()
   }
 }
