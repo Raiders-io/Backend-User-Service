@@ -28,6 +28,13 @@ export default class FriendsController {
     return FriendshipService.sendRequest(userId, params.friendId)
   }
 
+  async getStatus(ctx: HttpContext) {
+    const { params } = ctx
+    const userId = getUserId(ctx)
+
+    return FriendshipService.getStatus(userId, params.friendId)
+  }
+
   async cancelRequest(ctx: HttpContext) {
     const { params } = ctx
     const userId = getUserId(ctx)

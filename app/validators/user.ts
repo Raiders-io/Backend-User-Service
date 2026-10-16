@@ -14,9 +14,9 @@ export const createUserValidator = vine.create({
 
 export const updateUserValidator = vine.create({
   username: username().unique(isUsernameAvailable).optional(),
-  firstname: name().optional(),
-  lastname: name().optional(),
-  bio: bio().optional(),
+  firstname: name().optional().nullable(),
+  lastname: name().optional().nullable(),
+  bio: bio().optional().nullable(),
   avatar: avatar().optional(),
   background: background().optional(),
 })

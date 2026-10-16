@@ -46,6 +46,9 @@ router
                 router
                   .delete('/requests/:friendId', [controllers.Friends, 'cancelRequest'])
                   .where('friendId', uuid)
+
+                router.get('/:friendId', [controllers.Friends, 'getStatus']).where('friendId', uuid)
+
                 router
                   .delete('/:friendId', [controllers.Friends, 'destroy'])
                   .where('friendId', uuid)

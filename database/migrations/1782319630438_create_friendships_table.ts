@@ -18,6 +18,7 @@ export default class extends BaseSchema {
 
       table.index(['user_id', 'friend_id'])
       table.index(['friend_id', 'user_id'])
+      table.check('?? <> ??', ['user_id', 'friend_id'], 'friendships_no_self')
 
       table.timestamp('created_at')
     })

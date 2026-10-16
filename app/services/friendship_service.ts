@@ -1,5 +1,5 @@
 import Friendship from '#models/friendship'
-import { FriendshipStatus } from '#constants/friendship_status'
+import { FriendshipStatus, type RelationshipStatus } from '#constants/friendship_status'
 import {
   CannotFriendSelfException,
   FriendRequestAlreadyPendingException,
@@ -8,60 +8,66 @@ import {
 } from '#exceptions/friendships_exception'
 
 export class FriendshipService {
-  async sendRequest(userId: string, friendId: string) {
-    if (userId === friendId) {
-      throw new CannotFriendSelfException()
+  async getStatus(userId: string, targetId: string): Promise<RelationshipStatus> {
+    if (userId === targetId) return 'self'
+
+    const relation = await this.findRelation(userId, targetId)
+    if (!relation) return 'none'
+
+    switch (relation.status) {
+      case FriendshipStatus.ACCEPTED:
+        return 'friends'
+      case FriendshipStatus.PENDING:
+        return relation.userId === userId ? 'pending_sent' : 'pending_received'
+      default:
+        return 'none'
     }
+  }
+
+  async sendRequest(userId: string, friendId: string) {
+    if (userId === friendId) throw new CannotFriendSelfException()
 
     const existing = await this.findRelation(userId, friendId)
-    if (existing) {
-      switch (existing.status) {
-        case FriendshipStatus.PENDING:
-          throw new FriendRequestAlreadyPendingException()
-        case FriendshipStatus.ACCEPTED:
-          throw new AlreadyFriendsException()
-      }
-    }
+    if (existing) return this.resolveExisting(existing, userId)
 
-    return Friendship.create({
-      userId,
-      friendId,
-      status: FriendshipStatus.PENDING,
-    })
+    return Friendship.create({ userId, friendId, status: FriendshipStatus.PENDING })
+  }
+
+  private async resolveExisting(existing: Friendship, userId: string) {
+    if (existing.status === FriendshipStatus.ACCEPTED) throw new AlreadyFriendsException()
+    if (existing.userId === userId) throw new FriendRequestAlreadyPendingException()
+
+    existing.status = FriendshipStatus.ACCEPTED
+    await existing.save()
+    return existing
   }
 
   async acceptRequest(currentUserId: string, requesterId: string) {
-    const friendship = await Friendship.query()
-      .where((query) => {
-        query.where('user_id', requesterId).where('friend_id', currentUserId)
-      })
-      .where('status', FriendshipStatus.PENDING)
-      .firstOrFail()
-
+    const friendship = await this.findPending(requesterId, currentUserId)
     friendship.status = FriendshipStatus.ACCEPTED
     await friendship.save()
-
     return friendship
   }
 
   async declineRequest(currentUserId: string, requesterId: string) {
-    const friendship = await Friendship.query()
-      .where('user_id', requesterId)
-      .where('friend_id', currentUserId)
-      .where('status', FriendshipStatus.PENDING)
-      .firstOrFail()
-
-    await friendship.delete()
+    const request = await this.findPending(requesterId, currentUserId)
+    await request.delete()
   }
 
   async cancelRequest(currentUserId: string, targetId: string) {
-    const friendship = await Friendship.query()
-      .where('user_id', currentUserId)
-      .where('friend_id', targetId)
-      .where('status', FriendshipStatus.PENDING)
-      .firstOrFail()
+    const request = await this.findPending(currentUserId, targetId)
+    await request.delete()
+  }
 
-    await friendship.delete()
+  private async findPending(senderId: string, receiverId: string) {
+    const friendship = await Friendship.query()
+      .where('user_id', senderId)
+      .where('friend_id', receiverId)
+      .where('status', FriendshipStatus.PENDING)
+      .first()
+
+    if (!friendship) throw new FriendshipNotFoundException()
+    return friendship
   }
 
   async unfriend(userId: string, friendId: string) {

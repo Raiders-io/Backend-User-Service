@@ -73,14 +73,19 @@ export class UserService {
   }
 
   async update(id: string, payload: UpdateUserPayload): Promise<Me> {
-    const { avatar, ...rest } = payload
+    const { avatar, background, ...rest } = payload
     const user = await this.findById(id)
 
     if (avatar) {
       user.avatarUrl = await this.uploadAvatar(user.id, avatar)
     }
 
+    if (background) {
+      user.backgroundUrl = await this.uploadBackground(user.id, background)
+    }
+
     user.merge(rest)
+
     await user.save()
 
     const fresh = (await this.findExistingById(id))!
