@@ -7,6 +7,17 @@ export const USER_CONSTRAINTS = {
   NAME_MAX_LENGTH: 30,
   ASSETS_MAX_SIZE_MB: 2,
   ASSETS_ALLOWED_EXTENSIONS: ['jpg', 'jpeg', 'png', 'webp'],
+  RESERVED_USERNAMES: new Set([
+    'me',
+    'search',
+    'u',
+    'admin',
+    'api',
+    'avatar',
+    'background',
+    'friends',
+    'lessons',
+  ]),
 } as const
 
 export type PublicUser = Pick<

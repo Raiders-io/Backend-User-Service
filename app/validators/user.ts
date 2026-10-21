@@ -12,7 +12,7 @@ export const createUserValidator = vine.create({
   background: background().optional(),
 })
 
-export const updateUserValidator = vine.create({
+export const updateUserValidator = vine.withMetaData<{ userId: string }>().create({
   username: username().unique(isUsernameAvailable).optional(),
   firstname: name().optional().nullable(),
   lastname: name().optional().nullable(),
@@ -26,3 +26,5 @@ export const searchUsersValidator = vine.create({
   page: vine.number().min(1).optional(),
   limit: vine.number().min(1).max(DEFAULT_PAGINATION.MAX_LIMIT).optional(),
 })
+
+export const checkUsernameValidator = vine.create({ username: username() })

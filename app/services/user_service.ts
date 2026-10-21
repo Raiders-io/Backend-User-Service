@@ -24,13 +24,6 @@ type UpdateUserPayload = Infer<typeof updateUserValidator>
 type AvatarFile = NonNullable<UpdateUserPayload['avatar']>
 type BackgroundFile = NonNullable<UpdateUserPayload['background']>
 
-const FRIENDS_COUNT_SQL = `(
-  select count(distinct case when f.user_id = users.id then f.friend_id else f.user_id end)
-  from friendships f
-  where f.status = ?
-    and (f.user_id = users.id or f.friend_id = users.id)
-) as "friendsCount"`
-
 export class UserService {
   async queryById(id: string) {
     return this.query().where('users.id', id).first()
@@ -109,7 +102,17 @@ export class UserService {
 
   private query() {
     return User.query()
-      .select('users.*', db.raw(FRIENDS_COUNT_SQL, [FriendshipStatus.ACCEPTED]))
+      .select('users.*')
+      .select(
+        db
+          .from('friendships')
+          .where('status', FriendshipStatus.ACCEPTED)
+          .where((q) =>
+            q.where('user_id', db.ref('users.id')).orWhere('friend_id', db.ref('users.id'))
+          )
+          .count('*')
+          .as('friendsCount')
+      )
       .withCount('lesson_completions', (q) => q.as('lessonsCompletedCount'))
   }
 

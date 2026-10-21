@@ -13,6 +13,7 @@ export const username = () =>
     .trim()
     .minLength(1)
     .maxLength(USER_CONSTRAINTS.USERNAME_MAX_LENGTH)
+    .notIn([...USER_CONSTRAINTS.RESERVED_USERNAMES])
 
 export const name = () => vine.string().trim().maxLength(USER_CONSTRAINTS.NAME_MAX_LENGTH)
 

@@ -1,10 +1,11 @@
 import { DEFAULT_PAGINATION } from '#constants/global_constants'
+import { USER_CONSTRAINTS } from '#constants/user_constants'
 import UserAssetNotFoundException from '#exceptions/assets_exception'
 import UserIdNotFoundException from '#exceptions/user_id_not_found_exception'
 import UserNotFoundException from '#exceptions/user_not_found_exception'
 import UserService from '#services/user_service'
-import { getUserId } from '#services/utils_service'
-import { searchUsersValidator, updateUserValidator } from '#validators/user'
+import { getUserId, isUsernameAvailable } from '#services/utils_service'
+import { checkUsernameValidator, searchUsersValidator, updateUserValidator } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
 import drive from '@adonisjs/drive/services/main'
 
@@ -35,8 +36,22 @@ export default class UsersController {
     const { request } = ctx
     const userId = getUserId(ctx)
 
-    const payload = await request.validateUsing(updateUserValidator)
+    const payload = await request.validateUsing(updateUserValidator, {
+      meta: { userId },
+    })
+
     return UserService.update(userId, payload)
+  }
+
+  async usernameAvailable({ request, response }: HttpContext) {
+    const [error] = await checkUsernameValidator.tryValidate(request.qs())
+    if (error) {
+      const reserved = USER_CONSTRAINTS.RESERVED_USERNAMES.has(
+        String(request.qs().username ?? '').toLowerCase()
+      )
+      return response.ok({ available: false, reason: reserved ? 'reserved' : 'invalid' })
+    }
+    return response.ok({ available: false, reason: 'Username already taken' })
   }
 
   async getAvatar({ params, response }: HttpContext) {

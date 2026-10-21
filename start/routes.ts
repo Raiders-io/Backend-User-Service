@@ -71,6 +71,9 @@ router
         router.get('/:id', [controllers.Users, 'show']).where('id', uuid)
         router.get('/:id/avatar', [controllers.Users, 'getAvatar']).where('id', uuid)
         router.get('/:id/background', [controllers.Users, 'getBackground']).where('id', uuid)
+        router
+          .get('/username/available', [controllers.Users, 'usernameAvailable'])
+          .use(searchThrottle)
         //router.get('/:id/friends', [controllers.Users, 'show']).where('id', uuid)
       })
       .prefix('/profile')

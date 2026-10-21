@@ -2,6 +2,7 @@ import UserIdNotFoundException from '#exceptions/user_id_not_found_exception'
 import type { HttpContext } from '@adonisjs/core/http'
 import { DEFAULT_PAGINATION } from '#constants/global_constants'
 import { USER_CONSTRAINTS } from '#constants/user_constants'
+import type { VineDbSearchCallback } from '@adonisjs/lucid/types/vine'
 import User from '#models/user'
 
 export function getUserId(ctx: HttpContext): string {
@@ -22,10 +23,14 @@ export function getPaginationParams(ctx: HttpContext) {
   return { page, limit }
 }
 
-export async function isUsernameAvailable(db: any, value: string) {
-  const existing = await User.query({ client: db }).where('username', value).first()
+export const isUsernameAvailable: VineDbSearchCallback<string> = async (_db, value, field) => {
+  const query = User.query().where('username', value.trim().toLowerCase())
 
-  return !existing
+  const currentUserId = field.meta?.userId
+  if (currentUserId) query.whereNot('id', currentUserId)
+
+  const row = await query.select('id').first()
+  return !row
 }
 
 export async function generateUniqueTemporaryUsername(id: string): Promise<string> {
