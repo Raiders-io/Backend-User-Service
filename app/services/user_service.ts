@@ -70,11 +70,23 @@ export class UserService {
     const user = await this.findEnsuredById(id)
 
     if (avatar) {
+      const old = user.avatarUrl
       user.avatarUrl = await this.uploadAvatar(user.id, avatar)
+      if (old)
+        await drive
+          .use()
+          .delete(old)
+          .catch(() => {})
     }
 
     if (background) {
+      const old = user.backgroundUrl
       user.backgroundUrl = await this.uploadBackground(user.id, background)
+      if (old)
+        await drive
+          .use()
+          .delete(old)
+          .catch(() => {})
     }
 
     user.merge(rest)

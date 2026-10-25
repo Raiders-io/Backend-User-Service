@@ -55,28 +55,29 @@ export default class UsersController {
   }
 
   async getAvatar({ params, response }: HttpContext) {
-    const user = await UserService.findById(params.id)
+    const user = await UserService.queryById(params.id)
 
     if (!user) {
       throw new UserNotFoundException()
     }
 
     const path = user.avatarUrl
+    console.log(path)
     const disk = drive.use()
 
     if (!path || !(await disk.exists(path))) {
       throw new UserAssetNotFoundException()
     }
 
-    response.type(path)
-    response.header('Cache-Control', 'public, max-scale=86400, stale-while-revalidate=604800')
+    response.type('image/webp')
+    response.header('Cache-Control', 'public, max-age=16400, stale-while-revalidate=604800')
 
     const stream = await disk.getStream(path)
     return response.stream(stream)
   }
 
   async getBackground({ params, response }: HttpContext) {
-    const user = await UserService.findById(params.id)
+    const user = await UserService.queryById(params.id)
 
     if (!user) {
       throw new UserNotFoundException()
@@ -89,8 +90,8 @@ export default class UsersController {
       throw new UserAssetNotFoundException()
     }
 
-    response.type(path)
-    response.header('Cache-Control', 'public, max-scale=86400, stale-while-revalidate=604800')
+    response.type('image/webp')
+    response.header('Cache-Control', 'public, max-age=16400, stale-while-revalidate=604800')
 
     const stream = await disk.getStream(path)
     return response.stream(stream)
