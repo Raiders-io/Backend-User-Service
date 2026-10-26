@@ -62,11 +62,11 @@ export class RateLimitSchema extends BaseModel {
 export class UserSchema extends BaseModel {
   static $columns = ['avatarUpdatedAt', 'avatarUrl', 'backgroundUpdatedAt', 'backgroundUrl', 'bio', 'createdAt', 'currentStreak', 'firstname', 'id', 'lastActivityDate', 'lastname', 'longestStreak', 'updatedAt', 'username'] as const
   $columns = UserSchema.$columns
-  @column.date()
+  @column.dateTime()
   declare avatarUpdatedAt: DateTime | null
   @column()
   declare avatarUrl: string | null
-  @column.date()
+  @column.dateTime()
   declare backgroundUpdatedAt: DateTime | null
   @column()
   declare backgroundUrl: string | null

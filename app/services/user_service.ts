@@ -72,6 +72,7 @@ export class UserService {
     if (avatar) {
       const old = user.avatarUrl
       user.avatarUrl = await this.uploadAvatar(user.id, avatar)
+      user.avatarUpdatedAt = new Date().toISOString()
       if (old)
         await drive
           .use()
@@ -82,6 +83,7 @@ export class UserService {
     if (background) {
       const old = user.backgroundUrl
       user.backgroundUrl = await this.uploadBackground(user.id, background)
+      user.backgroundUpdatedAt = new Date().toISOString()
       if (old)
         await drive
           .use()

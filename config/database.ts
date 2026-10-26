@@ -12,16 +12,16 @@ const dbConfig = defineConfig({
     /**
      * SQLite connection (default).
      */
-    // sqlite: {
-    //   client: 'sqlite',
-    //   connection: {
-    //     filename: app.tmpPath('db.sqlite3'),
-    //   },
-    //   migrations: {
-    //     naturalSort: true,
-    //     paths: ['database/migrations'],
-    //   },
-    // },
+    sqlite: {
+      client: 'sqlite',
+      connection: {
+        filename: app.tmpPath('db.sqlite3'),
+      },
+      migrations: {
+        naturalSort: true,
+        paths: ['database/migrations'],
+      },
+    },
 
     /**
      * PostgreSQL connection.
