@@ -8,7 +8,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class FriendshipSchema extends BaseModel {
-  static $columns = ['createdAt', 'friendId', 'id', 'status', 'updatedAt', 'userId'] as const
+  static $columns = ['createdAt', 'friendId', 'id', 'status', 'userId'] as const
   $columns = FriendshipSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
@@ -18,51 +18,58 @@ export class FriendshipSchema extends BaseModel {
   declare id: number
   @column()
   declare status: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
   @column()
   declare userId: string
 }
 
 export class LessonCompletedSchema extends BaseModel {
-  static $columns = ['completedAt', 'createdAt', 'id', 'lessonId', 'updatedAt', 'userId'] as const
+  static $columns = ['completedAt', 'id', 'lessonId', 'userId'] as const
   $columns = LessonCompletedSchema.$columns
   @column.dateTime()
   declare completedAt: DateTime
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime | null
   @column({ isPrimary: true })
   declare id: number
   @column()
   declare lessonId: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
   @column()
   declare userId: string
 }
 
 export class LessonOngoingSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'lessonId', 'startedAt', 'updatedAt', 'userId'] as const
+  static $columns = ['id', 'lessonId', 'startedAt', 'userId'] as const
   $columns = LessonOngoingSchema.$columns
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime | null
   @column({ isPrimary: true })
   declare id: number
   @column()
   declare lessonId: string
   @column.dateTime()
-  declare startedAt: DateTime
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
+  declare startedAt: DateTime | null
   @column()
   declare userId: string
 }
 
+export class RateLimitSchema extends BaseModel {
+  static $columns = ['expire', 'key', 'points'] as const
+  $columns = RateLimitSchema.$columns
+  @column()
+  declare expire: bigint | number | null
+  @column({ isPrimary: true })
+  declare key: string
+  @column()
+  declare points: number
+}
+
 export class UserSchema extends BaseModel {
-  static $columns = ['avatarUrl', 'bio', 'createdAt', 'currentStreak', 'firstname', 'id', 'lastActivityDate', 'lastname', 'longestStreak', 'updatedAt', 'username'] as const
+  static $columns = ['avatarUpdatedAt', 'avatarUrl', 'backgroundUpdatedAt', 'backgroundUrl', 'bio', 'createdAt', 'currentStreak', 'firstname', 'id', 'lastActivityDate', 'lastname', 'longestStreak', 'updatedAt', 'username'] as const
   $columns = UserSchema.$columns
+  @column.date()
+  declare avatarUpdatedAt: DateTime | null
   @column()
   declare avatarUrl: string | null
+  @column.date()
+  declare backgroundUpdatedAt: DateTime | null
+  @column()
+  declare backgroundUrl: string | null
   @column()
   declare bio: string | null
   @column.dateTime({ autoCreate: true })

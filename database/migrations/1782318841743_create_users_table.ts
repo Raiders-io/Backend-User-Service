@@ -14,6 +14,8 @@ export default class extends BaseSchema {
       table.timestamp('updated_at')
       table.string('avatar_url').nullable()
       table.string('background_url').nullable()
+      table.date('avatar_updated_at').nullable()
+      table.date('background_updated_at').nullable()
 
       table.integer('current_streak').notNullable().defaultTo(0)
       table.integer('longest_streak').notNullable().defaultTo(0)

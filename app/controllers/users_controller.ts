@@ -70,7 +70,7 @@ export default class UsersController {
     }
 
     response.type('image/webp')
-    response.header('Cache-Control', 'public, max-age=16400, stale-while-revalidate=604800')
+    response.header('Cache-Control', 'public, max-age=300, stale-while-revalidate=86400')
 
     const stream = await disk.getStream(path)
     return response.stream(stream)
@@ -91,7 +91,7 @@ export default class UsersController {
     }
 
     response.type('image/webp')
-    response.header('Cache-Control', 'public, max-age=16400, stale-while-revalidate=604800')
+    response.header('Cache-Control', 'public, max-age=300, stale-while-revalidate=86400')
 
     const stream = await disk.getStream(path)
     return response.stream(stream)

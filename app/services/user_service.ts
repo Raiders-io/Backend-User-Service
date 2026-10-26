@@ -187,6 +187,8 @@ export class UserService {
       longestStreak: user.longestStreak,
       lessonsCompletedCount: user.lessonsCompletedCount,
       friendsCount: user.friendsCount,
+      avatarUpdatedAt: user.avatarUpdatedAt,
+      backgroundUpdatedAt: user.backgroundUpdatedAt,
     }
   }
 

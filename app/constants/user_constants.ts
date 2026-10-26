@@ -22,7 +22,15 @@ export const USER_CONSTRAINTS = {
 
 export type PublicUser = Pick<
   User,
-  'id' | 'username' | 'firstname' | 'lastname' | 'bio' | 'currentStreak' | 'longestStreak'
+  | 'id'
+  | 'username'
+  | 'firstname'
+  | 'lastname'
+  | 'bio'
+  | 'currentStreak'
+  | 'longestStreak'
+  | 'avatarUpdatedAt'
+  | 'backgroundUpdatedAt'
 > & {
   lessonsCompletedCount: number
   friendsCount: number

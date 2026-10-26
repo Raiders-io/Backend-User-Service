@@ -8,8 +8,8 @@ const placeholder: any = {}
 const routes = {
   'drive.fs.serve': {
     methods: ["GET","HEAD"],
-    pattern: '/uploads/*',
-    tokens: [{"old":"/uploads/*","type":0,"val":"uploads","end":""},{"old":"/uploads/*","type":2,"val":"*","end":""}],
+    pattern: '/api/v1/profile/assets/*',
+    tokens: [{"old":"/api/v1/profile/assets/*","type":0,"val":"api","end":""},{"old":"/api/v1/profile/assets/*","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/assets/*","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/assets/*","type":0,"val":"assets","end":""},{"old":"/api/v1/profile/assets/*","type":2,"val":"*","end":""}],
     types: placeholder as Registry['drive.fs.serve']['types'],
   },
   'users.show_me': {
@@ -54,11 +54,71 @@ const routes = {
     tokens: [{"old":"/api/v1/profile/me/lessons/:lessonId/unsubscribe","type":0,"val":"api","end":""},{"old":"/api/v1/profile/me/lessons/:lessonId/unsubscribe","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/me/lessons/:lessonId/unsubscribe","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/me/lessons/:lessonId/unsubscribe","type":0,"val":"me","end":""},{"old":"/api/v1/profile/me/lessons/:lessonId/unsubscribe","type":0,"val":"lessons","end":""},{"old":"/api/v1/profile/me/lessons/:lessonId/unsubscribe","type":1,"val":"lessonId","end":""},{"old":"/api/v1/profile/me/lessons/:lessonId/unsubscribe","type":0,"val":"unsubscribe","end":""}],
     types: placeholder as Registry['lessons.unsubscribe']['types'],
   },
+  'friends.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/profile/me/friends',
+    tokens: [{"old":"/api/v1/profile/me/friends","type":0,"val":"api","end":""},{"old":"/api/v1/profile/me/friends","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/me/friends","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/me/friends","type":0,"val":"me","end":""},{"old":"/api/v1/profile/me/friends","type":0,"val":"friends","end":""}],
+    types: placeholder as Registry['friends.index']['types'],
+  },
+  'friends.pending_requests': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/profile/me/friends/requests',
+    tokens: [{"old":"/api/v1/profile/me/friends/requests","type":0,"val":"api","end":""},{"old":"/api/v1/profile/me/friends/requests","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/me/friends/requests","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/me/friends/requests","type":0,"val":"me","end":""},{"old":"/api/v1/profile/me/friends/requests","type":0,"val":"friends","end":""},{"old":"/api/v1/profile/me/friends/requests","type":0,"val":"requests","end":""}],
+    types: placeholder as Registry['friends.pending_requests']['types'],
+  },
+  'friends.sent_requests': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/profile/me/friends/requests/sent',
+    tokens: [{"old":"/api/v1/profile/me/friends/requests/sent","type":0,"val":"api","end":""},{"old":"/api/v1/profile/me/friends/requests/sent","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/me/friends/requests/sent","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/me/friends/requests/sent","type":0,"val":"me","end":""},{"old":"/api/v1/profile/me/friends/requests/sent","type":0,"val":"friends","end":""},{"old":"/api/v1/profile/me/friends/requests/sent","type":0,"val":"requests","end":""},{"old":"/api/v1/profile/me/friends/requests/sent","type":0,"val":"sent","end":""}],
+    types: placeholder as Registry['friends.sent_requests']['types'],
+  },
+  'friends.send_request': {
+    methods: ["POST"],
+    pattern: '/api/v1/profile/me/friends/requests/:friendId',
+    tokens: [{"old":"/api/v1/profile/me/friends/requests/:friendId","type":0,"val":"api","end":""},{"old":"/api/v1/profile/me/friends/requests/:friendId","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/me/friends/requests/:friendId","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/me/friends/requests/:friendId","type":0,"val":"me","end":""},{"old":"/api/v1/profile/me/friends/requests/:friendId","type":0,"val":"friends","end":""},{"old":"/api/v1/profile/me/friends/requests/:friendId","type":0,"val":"requests","end":""},{"old":"/api/v1/profile/me/friends/requests/:friendId","type":1,"val":"friendId","end":""}],
+    types: placeholder as Registry['friends.send_request']['types'],
+  },
+  'friends.cancel_request': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/profile/me/friends/requests/:friendId',
+    tokens: [{"old":"/api/v1/profile/me/friends/requests/:friendId","type":0,"val":"api","end":""},{"old":"/api/v1/profile/me/friends/requests/:friendId","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/me/friends/requests/:friendId","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/me/friends/requests/:friendId","type":0,"val":"me","end":""},{"old":"/api/v1/profile/me/friends/requests/:friendId","type":0,"val":"friends","end":""},{"old":"/api/v1/profile/me/friends/requests/:friendId","type":0,"val":"requests","end":""},{"old":"/api/v1/profile/me/friends/requests/:friendId","type":1,"val":"friendId","end":""}],
+    types: placeholder as Registry['friends.cancel_request']['types'],
+  },
+  'friends.get_status': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/profile/me/friends/:friendId',
+    tokens: [{"old":"/api/v1/profile/me/friends/:friendId","type":0,"val":"api","end":""},{"old":"/api/v1/profile/me/friends/:friendId","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/me/friends/:friendId","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/me/friends/:friendId","type":0,"val":"me","end":""},{"old":"/api/v1/profile/me/friends/:friendId","type":0,"val":"friends","end":""},{"old":"/api/v1/profile/me/friends/:friendId","type":1,"val":"friendId","end":""}],
+    types: placeholder as Registry['friends.get_status']['types'],
+  },
+  'friends.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/profile/me/friends/:friendId',
+    tokens: [{"old":"/api/v1/profile/me/friends/:friendId","type":0,"val":"api","end":""},{"old":"/api/v1/profile/me/friends/:friendId","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/me/friends/:friendId","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/me/friends/:friendId","type":0,"val":"me","end":""},{"old":"/api/v1/profile/me/friends/:friendId","type":0,"val":"friends","end":""},{"old":"/api/v1/profile/me/friends/:friendId","type":1,"val":"friendId","end":""}],
+    types: placeholder as Registry['friends.destroy']['types'],
+  },
+  'friends.accept_request': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/profile/me/friends/requests/:askingId/accept',
+    tokens: [{"old":"/api/v1/profile/me/friends/requests/:askingId/accept","type":0,"val":"api","end":""},{"old":"/api/v1/profile/me/friends/requests/:askingId/accept","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/me/friends/requests/:askingId/accept","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/me/friends/requests/:askingId/accept","type":0,"val":"me","end":""},{"old":"/api/v1/profile/me/friends/requests/:askingId/accept","type":0,"val":"friends","end":""},{"old":"/api/v1/profile/me/friends/requests/:askingId/accept","type":0,"val":"requests","end":""},{"old":"/api/v1/profile/me/friends/requests/:askingId/accept","type":1,"val":"askingId","end":""},{"old":"/api/v1/profile/me/friends/requests/:askingId/accept","type":0,"val":"accept","end":""}],
+    types: placeholder as Registry['friends.accept_request']['types'],
+  },
+  'friends.decline_request': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/profile/me/friends/requests/:askingId/decline',
+    tokens: [{"old":"/api/v1/profile/me/friends/requests/:askingId/decline","type":0,"val":"api","end":""},{"old":"/api/v1/profile/me/friends/requests/:askingId/decline","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/me/friends/requests/:askingId/decline","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/me/friends/requests/:askingId/decline","type":0,"val":"me","end":""},{"old":"/api/v1/profile/me/friends/requests/:askingId/decline","type":0,"val":"friends","end":""},{"old":"/api/v1/profile/me/friends/requests/:askingId/decline","type":0,"val":"requests","end":""},{"old":"/api/v1/profile/me/friends/requests/:askingId/decline","type":1,"val":"askingId","end":""},{"old":"/api/v1/profile/me/friends/requests/:askingId/decline","type":0,"val":"decline","end":""}],
+    types: placeholder as Registry['friends.decline_request']['types'],
+  },
   'users.search': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/profile/search',
     tokens: [{"old":"/api/v1/profile/search","type":0,"val":"api","end":""},{"old":"/api/v1/profile/search","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/search","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/search","type":0,"val":"search","end":""}],
     types: placeholder as Registry['users.search']['types'],
+  },
+  'users.show_by_username': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/profile/u/:username',
+    tokens: [{"old":"/api/v1/profile/u/:username","type":0,"val":"api","end":""},{"old":"/api/v1/profile/u/:username","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/u/:username","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/u/:username","type":0,"val":"u","end":""},{"old":"/api/v1/profile/u/:username","type":1,"val":"username","end":""}],
+    types: placeholder as Registry['users.show_by_username']['types'],
   },
   'users.show': {
     methods: ["GET","HEAD"],
@@ -72,53 +132,17 @@ const routes = {
     tokens: [{"old":"/api/v1/profile/:id/avatar","type":0,"val":"api","end":""},{"old":"/api/v1/profile/:id/avatar","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/:id/avatar","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/:id/avatar","type":1,"val":"id","end":""},{"old":"/api/v1/profile/:id/avatar","type":0,"val":"avatar","end":""}],
     types: placeholder as Registry['users.get_avatar']['types'],
   },
-  'friends.index': {
+  'users.get_background': {
     methods: ["GET","HEAD"],
-    pattern: '/api/v1/friends/me',
-    tokens: [{"old":"/api/v1/friends/me","type":0,"val":"api","end":""},{"old":"/api/v1/friends/me","type":0,"val":"v1","end":""},{"old":"/api/v1/friends/me","type":0,"val":"friends","end":""},{"old":"/api/v1/friends/me","type":0,"val":"me","end":""}],
-    types: placeholder as Registry['friends.index']['types'],
+    pattern: '/api/v1/profile/:id/background',
+    tokens: [{"old":"/api/v1/profile/:id/background","type":0,"val":"api","end":""},{"old":"/api/v1/profile/:id/background","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/:id/background","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/:id/background","type":1,"val":"id","end":""},{"old":"/api/v1/profile/:id/background","type":0,"val":"background","end":""}],
+    types: placeholder as Registry['users.get_background']['types'],
   },
-  'friends.pending_requests': {
+  'users.username_available': {
     methods: ["GET","HEAD"],
-    pattern: '/api/v1/friends/me/requests',
-    tokens: [{"old":"/api/v1/friends/me/requests","type":0,"val":"api","end":""},{"old":"/api/v1/friends/me/requests","type":0,"val":"v1","end":""},{"old":"/api/v1/friends/me/requests","type":0,"val":"friends","end":""},{"old":"/api/v1/friends/me/requests","type":0,"val":"me","end":""},{"old":"/api/v1/friends/me/requests","type":0,"val":"requests","end":""}],
-    types: placeholder as Registry['friends.pending_requests']['types'],
-  },
-  'friends.sent_requests': {
-    methods: ["GET","HEAD"],
-    pattern: '/api/v1/friends/me/requests/sent',
-    tokens: [{"old":"/api/v1/friends/me/requests/sent","type":0,"val":"api","end":""},{"old":"/api/v1/friends/me/requests/sent","type":0,"val":"v1","end":""},{"old":"/api/v1/friends/me/requests/sent","type":0,"val":"friends","end":""},{"old":"/api/v1/friends/me/requests/sent","type":0,"val":"me","end":""},{"old":"/api/v1/friends/me/requests/sent","type":0,"val":"requests","end":""},{"old":"/api/v1/friends/me/requests/sent","type":0,"val":"sent","end":""}],
-    types: placeholder as Registry['friends.sent_requests']['types'],
-  },
-  'friends.send_request': {
-    methods: ["POST"],
-    pattern: '/api/v1/friends/me/requests/:friendId',
-    tokens: [{"old":"/api/v1/friends/me/requests/:friendId","type":0,"val":"api","end":""},{"old":"/api/v1/friends/me/requests/:friendId","type":0,"val":"v1","end":""},{"old":"/api/v1/friends/me/requests/:friendId","type":0,"val":"friends","end":""},{"old":"/api/v1/friends/me/requests/:friendId","type":0,"val":"me","end":""},{"old":"/api/v1/friends/me/requests/:friendId","type":0,"val":"requests","end":""},{"old":"/api/v1/friends/me/requests/:friendId","type":1,"val":"friendId","end":""}],
-    types: placeholder as Registry['friends.send_request']['types'],
-  },
-  'friends.cancel_request': {
-    methods: ["DELETE"],
-    pattern: '/api/v1/friends/me/requests/:friendId',
-    tokens: [{"old":"/api/v1/friends/me/requests/:friendId","type":0,"val":"api","end":""},{"old":"/api/v1/friends/me/requests/:friendId","type":0,"val":"v1","end":""},{"old":"/api/v1/friends/me/requests/:friendId","type":0,"val":"friends","end":""},{"old":"/api/v1/friends/me/requests/:friendId","type":0,"val":"me","end":""},{"old":"/api/v1/friends/me/requests/:friendId","type":0,"val":"requests","end":""},{"old":"/api/v1/friends/me/requests/:friendId","type":1,"val":"friendId","end":""}],
-    types: placeholder as Registry['friends.cancel_request']['types'],
-  },
-  'friends.destroy': {
-    methods: ["DELETE"],
-    pattern: '/api/v1/friends/me/:friendId',
-    tokens: [{"old":"/api/v1/friends/me/:friendId","type":0,"val":"api","end":""},{"old":"/api/v1/friends/me/:friendId","type":0,"val":"v1","end":""},{"old":"/api/v1/friends/me/:friendId","type":0,"val":"friends","end":""},{"old":"/api/v1/friends/me/:friendId","type":0,"val":"me","end":""},{"old":"/api/v1/friends/me/:friendId","type":1,"val":"friendId","end":""}],
-    types: placeholder as Registry['friends.destroy']['types'],
-  },
-  'friends.accept_request': {
-    methods: ["PATCH"],
-    pattern: '/api/v1/friends/me/requests/:askingId/accept',
-    tokens: [{"old":"/api/v1/friends/me/requests/:askingId/accept","type":0,"val":"api","end":""},{"old":"/api/v1/friends/me/requests/:askingId/accept","type":0,"val":"v1","end":""},{"old":"/api/v1/friends/me/requests/:askingId/accept","type":0,"val":"friends","end":""},{"old":"/api/v1/friends/me/requests/:askingId/accept","type":0,"val":"me","end":""},{"old":"/api/v1/friends/me/requests/:askingId/accept","type":0,"val":"requests","end":""},{"old":"/api/v1/friends/me/requests/:askingId/accept","type":1,"val":"askingId","end":""},{"old":"/api/v1/friends/me/requests/:askingId/accept","type":0,"val":"accept","end":""}],
-    types: placeholder as Registry['friends.accept_request']['types'],
-  },
-  'friends.decline_request': {
-    methods: ["PATCH"],
-    pattern: '/api/v1/friends/me/requests/:askingId/decline',
-    tokens: [{"old":"/api/v1/friends/me/requests/:askingId/decline","type":0,"val":"api","end":""},{"old":"/api/v1/friends/me/requests/:askingId/decline","type":0,"val":"v1","end":""},{"old":"/api/v1/friends/me/requests/:askingId/decline","type":0,"val":"friends","end":""},{"old":"/api/v1/friends/me/requests/:askingId/decline","type":0,"val":"me","end":""},{"old":"/api/v1/friends/me/requests/:askingId/decline","type":0,"val":"requests","end":""},{"old":"/api/v1/friends/me/requests/:askingId/decline","type":1,"val":"askingId","end":""},{"old":"/api/v1/friends/me/requests/:askingId/decline","type":0,"val":"decline","end":""}],
-    types: placeholder as Registry['friends.decline_request']['types'],
+    pattern: '/api/v1/profile/username/available',
+    tokens: [{"old":"/api/v1/profile/username/available","type":0,"val":"api","end":""},{"old":"/api/v1/profile/username/available","type":0,"val":"v1","end":""},{"old":"/api/v1/profile/username/available","type":0,"val":"profile","end":""},{"old":"/api/v1/profile/username/available","type":0,"val":"username","end":""},{"old":"/api/v1/profile/username/available","type":0,"val":"available","end":""}],
+    types: placeholder as Registry['users.username_available']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 
