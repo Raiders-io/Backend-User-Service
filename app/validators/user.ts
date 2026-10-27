@@ -27,4 +27,6 @@ export const searchUsersValidator = vine.create({
   limit: vine.number().min(1).max(DEFAULT_PAGINATION.MAX_LIMIT).optional(),
 })
 
-export const checkUsernameValidator = vine.create({ username: username() })
+export const checkUsernameValidator = vine.create({
+  username: username().unique(isUsernameAvailable),
+})

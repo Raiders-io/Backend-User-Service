@@ -43,14 +43,19 @@ export default class UsersController {
   }
 
   async usernameAvailable({ request, response }: HttpContext) {
-    const [error] = await checkUsernameValidator.tryValidate(request.qs())
-    if (error) {
-      const reserved = USER_CONSTRAINTS.RESERVED_USERNAMES.has(
-        String(request.qs().username ?? '').toLowerCase()
-      )
-      return response.ok({ available: false, reason: reserved ? 'reserved' : 'invalid' })
+    const usernameQuery = request.qs().username ?? ''
+    const lowerUsername = String(usernameQuery).trim().toLowerCase()
+
+    if (USER_CONSTRAINTS.RESERVED_USERNAMES.has(lowerUsername)) {
+      return response.ok({ available: false, reason: 'reserved' })
     }
-    return response.ok({ available: false, reason: 'Username already taken' })
+
+    try {
+      await checkUsernameValidator.validate({ username: usernameQuery })
+      return response.ok({ available: true })
+    } catch (error) {
+      return response.ok({ available: false, reason: 'Invalid or already taken' })
+    }
   }
 
   async getAvatar({ params, response }: HttpContext) {
