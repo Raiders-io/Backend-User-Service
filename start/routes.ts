@@ -27,8 +27,12 @@ router
             router
               .group(() => {
                 router.get('/:lessonId', [controllers.Lessons, 'status'])
-                router.post('/:lessonId/subscribe', [controllers.Lessons, 'subscribe'])
-                router.delete('/:lessonId/unsubscribe', [controllers.Lessons, 'unsubscribe'])
+                router
+                  .group(() => {
+                    router.post('/:lessonId/subscribe', [controllers.Lessons, 'subscribe'])
+                    router.delete('/:lessonId/unsubscribe', [controllers.Lessons, 'unsubscribe'])
+                  })
+                  .middleware(middleware.verifyLesson())
               })
               .prefix('/lessons')
               .where('lessonId', uuid)
