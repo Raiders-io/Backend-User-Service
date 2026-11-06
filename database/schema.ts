@@ -60,7 +60,22 @@ export class RateLimitSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['avatarUpdatedAt', 'avatarUrl', 'backgroundUpdatedAt', 'backgroundUrl', 'bio', 'createdAt', 'currentStreak', 'firstname', 'id', 'lastActivityDate', 'lastname', 'longestStreak', 'updatedAt', 'username'] as const
+  static $columns = [
+    'avatarUpdatedAt',
+    'avatarUrl',
+    'backgroundUpdatedAt',
+    'backgroundUrl',
+    'bio',
+    'createdAt',
+    'currentStreak',
+    'firstname',
+    'id',
+    'lastActivityDate',
+    'lastname',
+    'longestStreak',
+    'updatedAt',
+    'username',
+  ] as const
   $columns = UserSchema.$columns
   @column.dateTime()
   declare avatarUpdatedAt: DateTime | null

@@ -80,6 +80,6 @@ export default class BrokerProvider {
    * Preparing to shutdown the app
    */
   async shutdown() {
-    Broker.shutdown()
+    Broker.disconnect()
   }
 }
