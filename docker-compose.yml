@@ -2,7 +2,7 @@ services:
   user-service:
     build:
       context: ./.
-      target: dev # production or dev
+      target: production # production or dev
     container_name: user-service
     image: user-service:local
     environment:
@@ -18,14 +18,11 @@ services:
       - DB_PASSWORD=${DB_PASSWORD:?}
       - DB_DATABASE=${DB_DATABASE:?}
       - AUTH_SERVICE_URL=${AUTH_SERVICE_URL:?}
-    # volumes:
-    # - ./user-service:/app
-    # - /app/node_modules
     depends_on:
       postgres:
         condition: service_healthy
     ports:
-      - '3333:3333'
+      - "3333:3333"
     networks:
       - api-network
       - user-backend
@@ -38,14 +35,14 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
-    ports:
-      - '5432:5432' #TODO : Expose port only in dev mode, not in production
+    # ports:
+    # - "5432:5432" #TODO : Expose port only in dev mode, not in production
     networks:
       - user-backend
     volumes:
       - user-db-data:/var/lib/postgresql/18/docker
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_DATABASE}']
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_DATABASE}"]
       interval: 5s
       timeout: 5s
       retries: 10
